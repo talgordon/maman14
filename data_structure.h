@@ -1,12 +1,17 @@
 #define MAX_LINE 0;
 #define MAX_FILE 0;
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
-/*flags*/
+
 typedef struct PSW{
 	uint16_t ERROR : 1;
 	uint16_t LABEL : 1;
 	uint16_t Z : 1;
-}
+}PSW;
 
 typedef struct codeWord{
 	 uint16_t ARE : 3;
@@ -31,9 +36,6 @@ typedef struct dataWord{
 	 uint16_t data : 15;
 }dataWord;
 
-//word in memory
-uint16_t word;
-
 typedef struct memWord* memWordPtr;
 
 typedef struct memWord{
@@ -48,37 +50,50 @@ typedef struct error{
 	uint16_t lineNum;
 	char * errorType;
 	errorPtr next;
-}errorPtr;
+}error;
 
-const char * opcodeTable{"mov", "cmp", "add", "sub",
-		         "lea", "clr", "not", "inc", 
- 		         "dec", "jmp", "bne", "red", 
-		         "prn", "jsr", "rts", "stop"};
+const char * opcodeTable[16] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 
 typedef struct addressMethod{
 	uint8_t src : 4;
 	uint8_t dst : 4;
 }addressMethod;
 
+/**
 addressMethod addressTable[16];
-addressTable[0] = {15, 7};
-addressTable[1] = {15, 15}; 
-addressTable[2] = {15, 7}; 
-addressTable[3] = {15, 7}; 
-addressTable[4] = {4, 7}; 
-addressTable[5] = {0, 7}; 
-addressTable[6] = {0, 7}; 
-addressTable[7] = {0, 7}; 
-addressTable[8] = {0, 7}; 
-addressTable[9] = {0, 6}; 
-addressTable[10] = {0, 6}; 
-addressTable[11] = {0, 7}; 
-addressTable[12] = {0, 15}; 
-addressTable[13] = {0, 6}; 
-addressTable[14] = {0, 0}; 
-addressTable[15] = {0, 0};
-
-/*const char * registers ["r0,"r1","r2","r3","r4","r5","r6","r7"]*/
+addressTable[0].src = 15;
+addressTable[0].dst = 7;
+addressTable[1].src = 15; 
+addressTable[1].dst = 15; 
+addressTable[2].src = 15;
+addressTable[2].dst = 7;
+addressTable[3].src = 15;
+addressTable[3].dst = 7;
+addressTable[4].src = 4;
+addressTable[4].dst = 7; 
+addressTable[5].src = 0;
+addressTable[5].dst = 7; 
+addressTable[6].src = 0;
+addressTable[6].dst = 7; 
+addressTable[7].src = 0;
+addressTable[7].dst = 7; 
+addressTable[8].src = 0;
+addressTable[8].dst = 7; 
+addressTable[9].src = 0;
+addressTable[9].dst = 6; 
+addressTable[10].src = 0;
+addressTable[10].dst = 6;    
+addressTable[11].src = 0;
+addressTable[11].dst = 7;  
+addressTable[12].src = 0;
+addressTable[12].dst = 15; 
+addressTable[13].src = 0;
+addressTable[13].dst = 6;  
+addressTable[14].src = 0;
+addressTable[14].dst = 0;
+addressTable[15].src = 0;
+addressTable[15].dst = 0; 
+**/
 
 typedef struct label * labelPtr;
 typedef struct label

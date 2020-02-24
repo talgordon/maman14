@@ -1,13 +1,34 @@
 #include <stdio.h>
 #define MAX_WORDS 4096
-typedef struct wrd
+#define A 4
+#define R 2
+#define E 1
+#define IMMEDIATE 1
+#define DIRECT 2
+#define INDIRECT_REGISTER 4
+#define DIRECT_REGISTER 8
+
+typedef struct cmdWrd
 {
 	unsigned short ARE : 3;
 	unsigned short src : 4;
 	unsigned short dst : 4;
 	unsigned short opcode : 4;
-}word
+}cmdWord
 
+typedef struct infoWrd
+{
+	unsigned short ARE : 3;
+	unsigned short data : 12;
+}infoWrd
+
+typedef struct infoWord
+{
+	unsigned short ARE : 3;
+	unsigned short srcReg : 3;
+	unsigned short dstReg : 3;
+	unsigned short rest : 6;
+}infoWrdReg
 typedef struct wrd 
 {
 	unsigned char src : 4;
@@ -53,12 +74,12 @@ opTable[15] = "stop";
 
 int translateFirst()
 {
-	word firstWord;
+	cmdWord firstWord;
 	/**get the opcode - first 4 bits in the word**/
 	char *word;
 	int opcode;
 	word = getWord();
-	if ((opcode = check_opTable(fword)) < 0)
+	if ((opcode = check_opTable(word)) < 0)
 		/**error**/
 	else
 		firstWord.opcode = opcode;
@@ -73,8 +94,8 @@ int translateFirst()
 	srcType = 0;
 	dstType = 0;
 	int numOfOp;/**how to check if legal number of operands?**/
-	getOp(&srcName, &srcType, &dstName, %dstType, &numOfOp);
-	if (!(srcType == addTable[firstWord.opcode].src) && (dstType = addTable[firstWord.opcode].dst))
+	getOp(&srcName, &srcType, &dstName, &dstType, &numOfOp);
+	if (!(srcType&addTable[firstWord.opcode].src) && (dstType&addTable[firstWord.opcode].dst))
 		/**error**/
 	else
 	{
@@ -85,6 +106,71 @@ int translateFirst()
 
 			
 	/**get the ARE field - last 4 bits in the word**/
-	if (!dstType & 4)/**is not a direct address**/
-		firstWord.ARE = 4;
+	firstWord.ARE = A;
+	
+	
+
+	/**get the info words, one, two or non at all**/	
+	if((srcType == IMMEDIATE) || (srcType == DIRECT))
+	{
+		infoWord srcInfo;
+		if(srcType == IMMEDIATE)
+		{
+			srcInfo.data = two_complement(srcName);
+			srcInfo.ARE = A;
+		}
+		else
+		{
+			srcInfo.data = to_binary(label_address(srcName));
+			if(!is_extern(srcName))
+				srcInfo.ARE = R;
+			else
+				srcInfo.ARE = E;
+		}
+	}
+	else
+	{
+		if((srcType == INDIRECT_REGISTER) || (srcType == DIRECT_REGISTER))
+		{
+			infoWordReg srcInfoReg;
+			srcInfoReg.srcReg = to_binary(srcName);
+			srcInfoReg.ARE = A;
+			if (dstType == INDIRECT_REGISTER) || (dstType == DIRECT_REGISTER))
+				srcInfoReg.dstReg = to_binary(dstName);
+			else
+				srcInfoReg.dstReg = 0;
+			srcInfoReg.rest = 0;
+		}
+	}
+
+	if((dstType == IMMEDIATE) || (dstType == DIRECT))
+	{
+		infoWord dstInfo;
+		if(dstType == IMMEDIATE)
+		{
+			dstInfo.data = two_complement(dstName);
+			dstInfo.ARE = A;
+		}
+		else
+		{
+			dstInfo.data = to_binary(label_address(dstName));
+			if(!is_extern(dstName))
+				dstInfo.ARE = R;
+			else
+				dstInfo.ARE = E;
+		}
+	}
+	else
+	{
+		if((dstType == INDIRECT_REGISTER) || (dstType == DIRECT_REGISTER))
+		{
+			infoWordReg dstInfoReg;
+			dstInfoReg.dstReg = to_binary(dstName);
+			dstInfoReg.ARE = A;
+			dstInfoReg.srcReg = 0;
+			dstInfoReg.rest = 0;
+		}
+	}
+			
+	
 }

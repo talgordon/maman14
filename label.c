@@ -1,6 +1,6 @@
 #include "data_structure.h"
 
-enum status{SUCCESS, ALLOCATE_ERROR, EXISTENCE_ERROR, UNEXISTENCE_ERROR};
+enum status{SUCCESS, ERROR};
 enum labeltypes{UNDEFINED, DATA, ENTRY, EXTERN, CODE};
 enum labelFields{NAME, VALUE, TYPE};
 
@@ -17,7 +17,10 @@ int print_label()
 	labelPtr tmp;
 	tmp = (labelPtr)malloc(sizeof(label));
 	if(tmp == NULL)
-		return ALLOCATE_ERROR;
+	{
+		error_check("ALLOCATE");
+		return ERROR;
+	}
 	tmp = head;
 	while(tmp != NULL)
 	{
@@ -45,7 +48,10 @@ int add_label(char * name, int value, int type)
 		head = (labelPtr)malloc(sizeof(label));
 		head->labelName = (char *)malloc(sizeof(name)*sizeof(char));
 		if((head->labelName == NULL)||(head == NULL))
-			return ALLOCATE_ERROR;
+		{
+			check_error("ALLOCATE");
+			return ERROR;
+		}
 		strcpy(head->labelName, name);
 		head->value = value;
 		head->LabelType = type;
@@ -57,15 +63,26 @@ int add_label(char * name, int value, int type)
 		tmp = (labelPtr)malloc(sizeof(label));
 		newLabel = (labelPtr)malloc(sizeof(label));
 		if((tmp == NULL)||(newLabel == NULL))
-			return ALLOCATE_ERROR;
+		{
+			check_error("ALLOCATE");
+			return ERROR;
+		}
 		tmp = head;
 		while(tmp->next != NULL)
 		{
 			if(strcmp(tmp->labelName,name) == 0)
-				return EXISTENCE_ERROR;/**error**/
+			{
+				check_error("EXISTED");
+				return ERROR;
+			}
 			tmp = tmp->next;
 		}
 		newLabel->labelName = (char *)malloc(sizeof(name)*sizeof(char));
+		if (newLabel->labelName == NULL)
+		{
+			check_error("ALLOCATE");
+			return ERROR;
+		}
 		strcpy(newLabel->labelName, name);
 		newLabel->value = value;
 		newLabel->LabelType = type;
@@ -78,7 +95,10 @@ int add_label(char * name, int value, int type)
 int get_label(char *name, int feature, int featureType, labelPtr* label)
 {
 	if(*label == NULL)
-		return ALLOCATE_ERROR;
+	{
+		check_error("ALLOCATE");
+		return ERROR;
+	}
 	*label = head;
 	while(*label != NULL)
 	{
@@ -90,7 +110,8 @@ int get_label(char *name, int feature, int featureType, labelPtr* label)
 			return SUCCESS;
 		*label = (*label)->next;
 	}
-	return UNEXISTENCE_ERROR;
+	error_check("UNEXISTED");
+	return ERROR;
 }
 
 int update_label(int update, int updateType, char *name)
@@ -98,7 +119,10 @@ int update_label(int update, int updateType, char *name)
 	labelPtr tmp;
 	tmp = (labelPtr)malloc(sizeof(label));
 	if(tmp == NULL)
-		return ALLOCATE_ERROR;
+	{
+		check_error("ALLOCATE");
+		return ERROR;
+	}	
 	tmp = head;
 	while(tmp != NULL)
 	{
@@ -117,7 +141,8 @@ int update_label(int update, int updateType, char *name)
 		}
 		tmp = tmp->next;
 	}
-	return UNEXISTENCE_ERROR;
+	error_check("UNEXISTED");
+	return ERROR;
 }
 
 

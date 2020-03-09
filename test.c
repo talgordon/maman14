@@ -7,6 +7,7 @@
 /*#include "error.c"*/
 
 char buf[1000];
+
 void get_line()
 {
 	int line=0;

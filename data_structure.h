@@ -7,11 +7,11 @@
 #include <ctype.h>
 
 
-typedef struct PSW{
+/**typedef struct PSW{
 	uint16_t ERROR : 1;
 	uint16_t LABEL : 1;
 	uint16_t Z : 1;
-}PSW_hold;
+}PSW_hold;**/
 /**first code word**/
 typedef struct codeWord{
 	 uint16_t ARE : 3;
@@ -61,7 +61,7 @@ typedef struct memWord{
 	uint16_t index;
 	memWordPtr next;
 }memWord;
-
+/**
 typedef struct error* errorPtr;
 
 typedef struct error{
@@ -69,7 +69,7 @@ typedef struct error{
 	int errorType;
 	errorPtr next;
 }error;
-
+**/
 
 typedef struct addressMethod *addrMethodPtr;
 

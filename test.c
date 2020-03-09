@@ -81,6 +81,7 @@ int has_label(char * line)
 }
 
 typedef enum types{LABEL , DATA , STRING , EXTERN , ENTRY, OTHER}types;
+
 types get_word(char * line)
 {
 	/*char * cut_line = line;*/

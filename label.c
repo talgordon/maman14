@@ -1,4 +1,5 @@
 #include "data_structure.h"
+#include "error.c"
 
 enum status{SUCCESS, ERROR};
 enum labeltypes{UNDEFINED, DATA, ENTRY, EXTERN, CODE};

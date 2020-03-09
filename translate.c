@@ -1,8 +1,9 @@
 #include "binary.c"
 #include "error.c"
+#include "label.c"
 #define SUCCESS 0
 #define ERROR 1
-enum types{CODE, DATA, DATA_REG};
+enum types{CODE_WORD, DATA_WORD, DATA_REG_WORD};
 int DC, IC;
 memWordPtr dataHead;
 
@@ -51,7 +52,7 @@ int write_code_image(wordPtr ptr, int type)
 	IC = 0;
 	switch (type)
 	{
-		case (CODE):
+		case (CODE_WORD):
 		{
 			buffer[IC] = ptr.codeWordPtr->opcode;
 			buffer[IC] = (buffer[IC]<<4) + ptr.codeWordPtr->src;
@@ -60,7 +61,7 @@ int write_code_image(wordPtr ptr, int type)
 			IC++;
 			break;
 		}
-		case (DATA):
+		case (DATA_WORD):
 		{
 			
 			buffer[IC] = ptr.dataWordPtr->data;
@@ -68,7 +69,7 @@ int write_code_image(wordPtr ptr, int type)
 			IC++;
 			break;
 		}
-		case (DATA_REG):
+		case (DATA_REG_WORD):
 		{
 			buffer[IC] = ptr.regWordPtr->rest;
 			buffer[IC] = (buffer[IC]<<3) + ptr.regWordPtr->srcReg;

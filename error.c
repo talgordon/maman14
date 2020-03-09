@@ -2,6 +2,14 @@
 #define ERROR 1
 #define SUCCESS 0
 
+typedef struct error* errorPtr;
+
+typedef struct error{
+	uint16_t lineNum;
+	int errorType;
+	errorPtr next;
+}error;
+
 errorPtr head;
 enum errType{ALLOCATE, UNEXISTED};
 

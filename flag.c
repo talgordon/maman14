@@ -1,5 +1,10 @@
-#include "data_structure.h"
-
+#include <stdio.h>
+#include <string.h>
+typedef struct PSW{
+	uint16_t ERROR : 1;
+	uint16_t LABEL : 1;
+	uint16_t Z : 1;
+}PSW_hold;
 PSW_hold PSW;
 int get_flag(char * name)
 {

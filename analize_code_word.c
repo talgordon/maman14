@@ -1,4 +1,5 @@
-#include "translate.c"
+#include "translate.h"
+#inclulde "analize_input_line.h"
 #define MAX_WORDS 4096
 #define A 4
 #define R 2
@@ -7,8 +8,7 @@
 #define DIRECT 2
 #define INDIRECT_REGISTER 4
 #define DIRECT_REGISTER 8
-#define ERROR 1
-#define SUCCESS 0
+
 const char * opcodeTable[16] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 /**addressMethod addressTable[16];
 addressTable[0]->src = 15;

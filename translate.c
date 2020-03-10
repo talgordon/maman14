@@ -1,14 +1,4 @@
-#include "binary.c"
-#include "error.c"
-#include "label.c"
-#define SUCCESS 0
-#define ERROR 1
-enum types{CODE_WORD, DATA_WORD, DATA_REG_WORD};
-int DC, IC;
-memWordPtr dataHead;
-
-int buffer[4096];
-
+#include "translate.h"
 int write_data_image(dataWord dWord)
 {	
 	memWordPtr tmp, newWord;

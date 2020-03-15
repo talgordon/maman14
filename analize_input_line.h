@@ -5,7 +5,7 @@ unsigned int DC = 0;
 unsigned int IC = 0;
 unsigned int L = 0;
 
-typedef enum type{LABEL , DATA , STRING , EXTERN , ENTRY, OTHER} types;
+typedef enum type{LABEL , DATA , STRING , EXTERN , ENTRY, OTHER, END} types;
 
 void get_line(int argc, char * argv[]);
 void skip_spaces(char **line);

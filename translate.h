@@ -1,6 +1,4 @@
-#include "binary.c"
-#include "label.c"
-#include "analize_code_word.c"
+
 typedef struct memWord* memWordPtr;
 
 typedef struct memWord{

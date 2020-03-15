@@ -1,4 +1,4 @@
-#include "label.h"
+#include "error.h"
 
 void print_label()
 {
@@ -12,15 +12,15 @@ void print_label()
 	while(tmp != NULL)
 	{
 		printf("\n%s, %d, ", tmp->labelName, tmp->labelValue);
-		if(tmp->labelType == DATA)
+		if(tmp->labelType == DATA_LABEL)
 			printf("data\n");
-		if(tmp->labelType == ENTRY)
+		if(tmp->labelType == ENTRY_LABEL)
 			printf("entry\n");
-		if(tmp->labelType == EXTERN)
+		if(tmp->labelType == EXTERN_LABEL)
 			printf("extern\n");
-		if(tmp->labelType == CODE)
+		if(tmp->labelType == CODE_LABEL)
 			printf("code\n");
-		if(tmp->labelType == UNDEFINED)
+		if(tmp->labelType == UNDEFINED_LABEL)
 			printf("undefined\n");
 		tmp = tmp->next;	
 	}

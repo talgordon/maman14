@@ -1,5 +1,5 @@
-#include ""
-
+#include "translate.h"
+#include "analize_input_line.h"
 void data_handle();
 void extern_handle();
 void entry_handle();
@@ -32,24 +32,25 @@ void data_handle(char * labelName, int type)
 void entry_handle()
 {
 	char *word;
-	while (get_word(&word)!= END);
+	while (get_word(&word, &buf[line_num])!= END)
 		update_lable(ENTRY_LABEL, LABEL_TYPE, word);
 }
 
 void extern_handle()
 {
 	char *word;
-	while (get_word(&word)!= END);
+	while (get_word(&word, &buf[line_num])!= END)
 		add_lable(word, NO_ADDRESS, EXTERN_LABEL);
 }
 
 void code_handle_first(char * labelName, char * word)
 {
-	int srcType dstType, opcode;
-	char * srcName, char * dstName;
+	int srcType, dstType, opcode;
+	char * srcName;
+	char * dstName;
 	wordPtr wPtr;
 	if (get_flag("LABEL") == 1)
-
+	{
 		add_label(labelName, IC, CODE_LABEL);
 		set_flag("LABEL", 0);
 	}

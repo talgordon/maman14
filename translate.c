@@ -39,7 +39,7 @@ int write_data_image(dataWord dWord)
 
 int write_code_image(wordPtr ptr, int type)
 {
-	IC = 0;
+	IC = 100;
 	switch (type)
 	{
 		case (CODE_WORD):
@@ -48,7 +48,6 @@ int write_code_image(wordPtr ptr, int type)
 			buffer[IC] = (buffer[IC]<<4) + ptr.codeWordPtr->src;
 			buffer[IC] = (buffer[IC]<<4) + ptr.codeWordPtr->dst;
 			buffer[IC] = (buffer[IC]<<3) + ptr.codeWordPtr->ARE;
-			IC++;
 			break;
 		}
 		case (DATA_WORD):
@@ -56,7 +55,6 @@ int write_code_image(wordPtr ptr, int type)
 			
 			buffer[IC] = ptr.dataWordPtr->data;
 			buffer[IC] = (buffer[IC]<<3) + ptr.dataWordPtr->ARE;
-			IC++;
 			break;
 		}
 		case (DATA_REG_WORD):
@@ -65,7 +63,6 @@ int write_code_image(wordPtr ptr, int type)
 			buffer[IC] = (buffer[IC]<<3) + ptr.regWordPtr->srcReg;
 			buffer[IC] = (buffer[IC]<<3) + ptr.regWordPtr->dstReg;
 			buffer[IC] = (buffer[IC]<<3) + ptr.regWordPtr->ARE;
-			IC++;
 			break;
 		}	
 	}
@@ -96,7 +93,7 @@ int print_mem()
 	printf("\n");
 	return SUCCESS;
 }
-
+/**
 int main()
 {
 	wordPtr ptr;
@@ -118,4 +115,4 @@ int main()
 	write_code_image(ptr, CODE);
 	print_mem();
 	return 0;	
-}
+}**/

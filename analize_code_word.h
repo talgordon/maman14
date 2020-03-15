@@ -60,9 +60,9 @@ typedef struct addressMethod{
 
 int find_opcode(char * opcode);
 
-int translate_code();
+int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType, char *srcName, char* dstName);
 
-int finish_translate(char *line);
+int finish_translate(char *line, wordPtr wPtr);
 
 int translate_data(int type, char * line);
 

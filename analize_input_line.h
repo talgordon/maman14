@@ -1,4 +1,4 @@
-#include "label.h"
+
 #include <ctype.h>
 	
 unsigned int DC = 0;
@@ -13,6 +13,6 @@ void legal_EOL(char ** line);
 void comma_logic(char **line);
 int get_data(char **line);
 int has_label(char * line);
-types get_word(char * line);
-void get_operand(char * line, int * srcType, int *dstType, char * srcName, char * dstName);
+types get_word(char ** line, char ** word);
+void get_operand(char * line, int * srcType, int *dstType, char ** srcName, char ** dstName);
 

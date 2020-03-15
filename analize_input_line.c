@@ -37,7 +37,7 @@ void init()
 	addressTable[15].dst = 0; 
 }
 
-char buf[1000];
+char * buf[1000];
 void get_line(int argc, char * argv[])
 {
 	FILE *ptr;
@@ -165,11 +165,20 @@ int has_label(char * line)
 	return 1;
 }
 
-types get_word(char * line)
+types get_word(char ** line, char ** word)
 {
-	skip_spaces(&line);
-	if(!(has_label(line)))/*check if is label*/
+	char * pch;
+	char * str=NULL;
+	skip_spaces(line);
+	if (**line == "\n")
 	{
+		return END;	
+	}
+	if(!(has_label(*line)))/*check if is label*/
+	{
+		pch=(strpbrk(*line," \t\n,"));
+		strncpy(*word,*line,(pch-*line));
+		*line=pch;
 		return LABEL;
 	}
 
@@ -179,30 +188,43 @@ types get_word(char * line)
 	{
 		if(strcmp(line,".data")==0)
 		{
+			pch=(strpbrk(*line," \t\n,"));
+			strncpy(*word,*line,(pch-*line));
+			*line=pch;
 			return DATA;
 		}
 
 		else if(strcmp(line,".string")==0)
 		{
+			pch=(strpbrk(*line," \t\n,"));
+			strncpy(*word,*line,(pch-*line));
+			*line=pch;
 			return STRING;
 		}
 
 		else if(strcmp(line,".extern")==0)
 		{
+			pch=(strpbrk(*line," \t\n,"));
+			strncpy(*word,*line,(pch-*line));
+			*line=pch;
 			return EXTERN;
 		}
 
 		else if(strcmp(line,".entry")==0)
 		{
+			pch=(strpbrk(*line," \t\n,"));
+			strncpy(*word,*line,(pch-*line));
+			*line=pch;
 			return ENTRY;
 		}
 	}
-		return OTHER;
+	pch=(strpbrk(*line," \t\n,"));
+	strncpy(*word,*line,(pch-*line));
+	*line=pch;
+	return OTHER;
 }
 
-
-
-void get_operand(char * line, int *srcType, int *dstType, char * srcName, char * dstName)
+void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char ** dstName)
 {
 	labelPtr label;
 	label=(labelPtr)malloc(sizeof(label));
@@ -215,7 +237,7 @@ void get_operand(char * line, int *srcType, int *dstType, char * srcName, char *
 		{
 			*srcType=1;
 			pch=(strpbrk(line," \t\n,"));
-			strncpy(srcName,line,(pch-line));
+			strncpy(*srcName,line,(pch-line));
 			line=pch;
 		}
 
@@ -225,7 +247,7 @@ void get_operand(char * line, int *srcType, int *dstType, char * srcName, char *
 			pch=(strpbrk(line," \t\n,"));
 			strncpy(str,line,(pch-line));
 			line=pch;
-			strcpy(srcName, (str+1));    
+			strcpy(*srcName, (str+1));    
 		}
  		
 		default :
@@ -237,7 +259,7 @@ void get_operand(char * line, int *srcType, int *dstType, char * srcName, char *
 			if((*str == 'r')&&(*(str+1)< 8)&&(*(str+1) > 0)&&(strlen(str) == 2))
 			{
 				*srcType = 8;
-				strcpy(srcName, (str+1));
+				strcpy(*srcName, (str+1));
 			}
 			else
 			{
@@ -245,7 +267,7 @@ void get_operand(char * line, int *srcType, int *dstType, char * srcName, char *
 				if(label!=NULL)
 				{
 					*srcType = 2;
-					strcpy(srcName, str);
+					strcpy(*srcName, str);
 				}
 				else
 				{
@@ -265,7 +287,7 @@ void get_operand(char * line, int *srcType, int *dstType, char * srcName, char *
 		{
 			*dstType=1;
 			pch=(strpbrk(line," \t\n,"));
-			strncpy(dstName,line,(pch-line));
+			strncpy(*dstName,line,(pch-line));
 			line=pch;
 		}
 
@@ -275,7 +297,7 @@ void get_operand(char * line, int *srcType, int *dstType, char * srcName, char *
 			pch=(strpbrk(line," \t\n,"));
 			strncpy(str,line,(pch-line));
 			line=pch;
-			strcpy(dstName, (str+1));    
+			strcpy(*dstName, (str+1));    
 		}
  		
 		default :
@@ -287,7 +309,7 @@ void get_operand(char * line, int *srcType, int *dstType, char * srcName, char *
 			if((*str == 'r')&&(*(str+1)< 8)&&(*(str+1) > 0)&&(strlen(str) == 2))
 			{
 				*dstType = 8;
-				strcpy(dstName, (str+1));
+				strcpy(*dstName, (str+1));
 			}
 			else
 			{
@@ -295,7 +317,7 @@ void get_operand(char * line, int *srcType, int *dstType, char * srcName, char *
 				if(label!=NULL)
 				{
 					*dstType = 2;
-					strcpy(dstName, str);
+					strcpy(*dstName, str);
 				}
 				else
 				{
@@ -317,6 +339,7 @@ int main(int argc, char * argv[])
 	int * dstType=2;
 	char * srcName=srcName;
 	char * dstName=dstName;
+	bufIndex = 0;
 
 	get_line(argc, argv);
 	get_word(buf);

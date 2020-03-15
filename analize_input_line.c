@@ -1,5 +1,6 @@
 #include "analize_input_line.h"
 #include "analize_code_word.h"
+#include "error.h"
 
 void init()
 {

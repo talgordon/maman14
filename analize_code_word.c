@@ -1,5 +1,5 @@
-#include "translate.h"
-#inclulde "analize_input_line.h"
+#include "translate.c"
+#include "analize_input_line.h"
 #define MAX_WORDS 4096
 #define A 4
 #define R 2
@@ -56,29 +56,13 @@ int find_opcode(char * opcode)
 	return -1;
 }
 
-int translate_code()
+int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType, char * srcName, char * dstName)
 {
 	codeWord firstWord;
 	/**get the opcode - first 4 bits in the word**/
-	char *word;
-	int opcode;
-	if (getWord(word)!=OTHER)
-		return ERROR;
-	if ((opcode = find_opcode(word)) < 0)
-		error_check("OPCODE");
-	else
-		firstWord.opcode = opcode;
-
+	firstWord.opcode = opcode;
 
 	/**get the address method - next 8 bits in the word**/
-	char * srcName;
-	char * dstName;
-	int srcType;
-	int dstType;
-	srcType = 0;
-	dstType = 0;
-	get_operands(&srcName, &srcType, &dstName, &dstType);
-
 	int numOfOp_table, numOfOp_line;
 	numOfOp_table = 0;
 	numOfOp_line = 0;
@@ -101,13 +85,13 @@ int translate_code()
 		firstWord.dst = dstType;
 	}
 		
-		
 	/**get the ARE field - last 4 bits in the word**/
 	firstWord.ARE = A;
-	
+	wPtr.codeWordPtr = &firstWord;
+	write_code_image(wPtr, CODE_WORD);
 }
 
-int finish_translate(char *line)
+int finish_translate(char *line, wordPtr wPtr)
 {
 	char * srcName;
 	char * dstName;
@@ -115,7 +99,7 @@ int finish_translate(char *line)
 	int dstType;
 	srcType = 0;
 	dstType = 0;
-	get_operands(&srcName, &srcType, &dstName, &dstType);
+	get_operands(line, &srcName, &srcType, &dstName, &dstType);
 	/**get the info words, one, two or non at all**/	
 	if((srcType == IMMEDIATE) || (srcType == DIRECT))
 	{
@@ -136,6 +120,8 @@ int finish_translate(char *line)
 			else
 				srcInfo.ARE = R;
 		}
+		wPtr.dataWordPtr = &srcInfo;
+		write_code_image(wPtr, DATA_WORD);
 	}
 	else
 	{
@@ -147,6 +133,8 @@ int finish_translate(char *line)
 		else
 			srcInfoReg.dstReg = 0;
 		srcInfoReg.rest = 0;
+		wPtr.regWordPtr = &srcInfoReg;
+		write_code_image(wPtr, DATA_REG_WORD);
 	}
 
 	if((dstType == IMMEDIATE) || (dstType == DIRECT))
@@ -168,6 +156,8 @@ int finish_translate(char *line)
 			else
 				dstInfo.ARE = R;
 		}
+		wPtr.dataWordPtr = &dstInfo;
+		write_code_image(wPtr, DATA_WORD);
 	}
 	else
 	{
@@ -176,6 +166,8 @@ int finish_translate(char *line)
 		dstInfoReg.ARE = A;
 		dstInfoReg.srcReg = 0;
 		dstInfoReg.rest = 0;
+		wPtr.regWordPtr = &dstInfoReg;
+		write_code_image(wPtr, DATA_REG_WORD);
 	}
 			
 	

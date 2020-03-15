@@ -1,46 +1,41 @@
+#include "analize_input_line.h"
+#include "analize_code_word.h"
 
-
-#include "label.h"
-#include <ctype.h>
-	
-unsigned int DC = 0;
-unsigned int IC = 0;
-unsigned int L = 0;
-/**
-addressMethod addressTable[16];
-addressTable[0].src = 15;
-addressTable[0].dst = 7;
-addressTable[1].src = 15; 
-addressTable[1].dst = 15; 
-addressTable[2].src = 15;
-addressTable[2].dst = 7;
-addressTable[3].src = 15;
-addressTable[3].dst = 7;
-addressTable[4].src = 4;
-addressTable[4].dst = 7; 
-addressTable[5].src = 0;
-addressTable[5].dst = 7; 
-addressTable[6].src = 0;
-addressTable[6].dst = 7; 
-addressTable[7].src = 0;
-addressTable[7].dst = 7; 
-addressTable[8].src = 0;
-addressTable[8].dst = 7; 
-addressTable[9].src = 0;
-addressTable[9].dst = 6; 
-addressTable[10].src = 0;
-addressTable[10].dst = 6;    
-addressTable[11].src = 0;
-addressTable[11].dst = 7;  
-addressTable[12].src = 0;
-addressTable[12].dst = 15; 
-addressTable[13].src = 0;
-addressTable[13].dst = 6;  
-addressTable[14].src = 0;
-addressTable[14].dst = 0;
-addressTable[15].src = 0;
-addressTable[15].dst = 0; 
-**/
+void init()
+{
+	addressTable[0].src = 15;
+	addressTable[0].dst = 7;
+	addressTable[1].src = 15; 
+	addressTable[1].dst = 15; 
+	addressTable[2].src = 15;
+	addressTable[2].dst = 7;
+	addressTable[3].src = 15;
+	addressTable[3].dst = 7;
+	addressTable[4].src = 4;
+	addressTable[4].dst = 7; 
+	addressTable[5].src = 0;
+	addressTable[5].dst = 7; 
+	addressTable[6].src = 0;
+	addressTable[6].dst = 7; 
+	addressTable[7].src = 0;
+	addressTable[7].dst = 7; 
+	addressTable[8].src = 0;
+	addressTable[8].dst = 7; 
+	addressTable[9].src = 0;
+	addressTable[9].dst = 6; 
+	addressTable[10].src = 0;
+	addressTable[10].dst = 6;    
+	addressTable[11].src = 0;
+	addressTable[11].dst = 7;  
+	addressTable[12].src = 0;
+	addressTable[12].dst = 15; 
+	addressTable[13].src = 0;
+	addressTable[13].dst = 6;  
+	addressTable[14].src = 0;
+	addressTable[14].dst = 0;
+	addressTable[15].src = 0;
+	addressTable[15].dst = 0; 
+}
 
 char buf[1000];
 void get_line(int argc, char * argv[])
@@ -141,7 +136,7 @@ int get_data(char **line)
 			
 		}
 		skip_spaces(line);
-		if (**line != ',') /**there is not a comma between two numbers, error**/
+		if (**line != ',') /**there is not a comma between two number, error**/
 		{
 			error_check("INVALID_DATA");
 		}
@@ -156,7 +151,6 @@ int get_data(char **line)
 }
 
 
-typedef enum type{LABEL , DATA , STRING , EXTERN , ENTRY, OTHER} types;
 int has_label(char * line)
 {
 	while (!(isspace(*line)))
@@ -208,12 +202,12 @@ types get_word(char * line)
 
 
 
-void get_operand(char * line, int * srcType, int *dstType, char * srcName, char * dstName)
+void get_operand(char * line, int *srcType, int *dstType, char * srcName, char * dstName)
 {
 	labelPtr label;
 	label=(labelPtr)malloc(sizeof(label));
 	char * pch;
-	char * str;
+	char * str=NULL;
 	skip_spaces(&line);
 	switch(*line)
 	{
@@ -316,4 +310,16 @@ void get_operand(char * line, int * srcType, int *dstType, char * srcName, char 
 }
 
 
+int main(int argc, char * argv[])
+{
+	char * line;
+	int * srcType=1;
+	int * dstType=2;
+	char * srcName=srcName;
+	char * dstName=dstName;
 
+	get_line(argc, argv);
+	get_word(buf);
+	get_operand(line, srcType,dstType,srcName,dstName);
+	return 0;
+}

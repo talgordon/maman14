@@ -1,5 +1,3 @@
-#include "error.h"
-
 typedef struct label * labelPtr;
 typedef struct label
 {

@@ -1,4 +1,6 @@
 #include "translate.h"
+#include "error.h"
+#include "analize_code_word.h"
 int write_data_image(dataWord dWord)
 {	
 	memWordPtr tmp, newWord;

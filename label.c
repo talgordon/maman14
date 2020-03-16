@@ -1,5 +1,21 @@
 #include "error.h"
+#include "label.h"
+/**
+int main()
+{
+	labelPtr tmp;
+	tmp = (labelPtr)malloc(sizeof(label));
 
+	add_label("MAIN", 130, ENTRY_LABEL);
+	add_label("LIST", 143, DATA_LABEL);
+	add_label("END", 147, CODE_LABEL);
+		
+	get_label(NULL, ENTRY_LABEL, LABEL_TYPE, &tmp);
+	update_label(EXTERN_LABEL, LABEL_TYPE, tmp->labelName);
+	
+	print_label();
+	return 0;	
+}**/
 void print_label()
 {
 	labelPtr tmp;

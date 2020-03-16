@@ -1,4 +1,3 @@
-
 typedef struct memWord* memWordPtr;
 
 typedef struct memWord{
@@ -17,3 +16,4 @@ unsigned int buffer[4096];
 int write_data_image(dataWord dWord);
 int write_code_image(wordPtr ptr, int type);
 int print_mem();
+

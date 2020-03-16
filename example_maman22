@@ -1,0 +1,391 @@
+#include "set.h"
+/**the program is kind of a pocket calculator for sets.
+there are 6 SET, and the user can insert a command line with a function name and the name of the SET to do the function on.
+the possibilities are READ, PRINT, UNION, INTERSECT, SUB AND SYMDIFF, STOP will finish the program.
+**/
+
+/**the main function:
+-defines six SET variable (a struct we defined with typedef) - each one contains the set name, and a group of integers in the range [0..127].
+-gets a command line from the user.
+-analyzes the command line and checks if it is legal (using get_funcName, get_setName, get_numList, leagl_EOL, skip_spaces).
+-print an error massege in case of error, or call to the appropriate function from "set.c".
+
+input: a command line (name of function, parameters from the type set of they are needed)
+output: an error massege if the command line is not legal\ the output from the function which the user called to, if it is exists.
+**/
+int main()
+{
+	int i, setIndex1, setIndex2, setIndex3; /**indexes which are represent on which set the function should work on**/
+	int setToRead[NUMBERS_ARRAY_LENGTH]; /**an array to get the numList which the user insert after READ**/
+	char line[MAXLINE]; /**the input will be inserted to here**/
+	char *cmdLine; /**a pointer to the current char to read in the input line**/
+	char *funcName; /**the function which the user inserted**/
+	set * (sets[NUM_OF_SETS]); /**an array with 6 pointers to SET, to send to the functions**/
+	set SETA, SETB, SETC, SETD, SETE, SETF; /**the SETS which the functions will work on**/
+	
+	/**allocate place in the memory for the pointers**/
+	cmdLine = (char *)malloc(MAXLINE*sizeof(char));
+	funcName = (char *)malloc(MAXLINE*sizeof(char));
+	
+	/**initialize the array and the SETS**/
+	sets[0] = &SETA;
+	sets[1] = &SETB;
+	sets[2] = &SETC;
+	sets[3] = &SETD;
+	sets[4] = &SETE;
+	sets[5] = &SETF; 
+	
+	for (i = 0; i<NUMBERS_ARRAY_LENGTH; i++)
+	{		
+		SETA.numbers[i] = 0;	
+	}
+
+	SETB = SETA;
+	SETC = SETA;
+	SETD = SETA;
+	SETE = SETA;
+	SETF = SETA;
+	
+	/**a massege to the user, what input he can insert and how**/
+	printf("welcome to 'set' program. You can implement several functions on sets here.\n\n");
+	printf("To place member in a set - insert 'read_set (set name), int,int,...,-1'\nTo print a set - insert 'print_set (set name)'\nTo union/intersect/subtract/symmetric differnce two sets and save the result - insert 'union/intersect/sub/symdiff _set (1st set name), (2nd set name), (3rd set name)'\nTo finish the program - insert 'stop'\n\n");
+	printf("Function names must be in lower case, and set namse in upper.\nYou can insert as many white spaces as you want, but you must'nt insert any other character after the end of the command line.\n");
+	/**the program loop, work until the user will insert STOP, (or EOF is reached, however it will be an error)**/
+	while (1)
+	{
+		memset(cmdLine, '\0', strlen(cmdLine)); /**initialize the cmdLine pointer, to aviod junk cells**/
+		memset(funcName, '\0', strlen(funcName)); /**initialize the funcName pointer, to aviod junk cells**/
+		printf("\nPlease enter a command:\n");
+		if (fgets(line, MAXLINE, stdin) != NULL) /**get a command line from the user, if its not EOF initialize cmdLine to point on the first char**/
+			cmdLine = &line[0];
+		else
+		{
+			if (feof(stdin)) /**if the program reached EOF (and didn't finish with STOP) print an appropriate error massege and finish the program**/
+				printf("Reached EOF before finish the program with stop\n");
+			else /**different error (didn't reached EOF) in fgets, finish the program**/
+				printf("unknown error interupted read\n");
+			return 0;
+		}
+		printf("%s\n",cmdLine);
+		if (get_funcName(&funcName, &cmdLine) == SUCCESS) /**get valid command type**/
+		{
+			if (strcmp(funcName,"stop") != SUCCESS)	/**If not STOP**/	
+			{
+					setIndex1 = get_setName(&cmdLine);/**get the 1st parameter in input line, save its index in the SET array**/
+					if (setIndex1 != ERROR) /**get valid name of 1st SET**/
+					{
+						if (strcmp(funcName, "print_set") != 0)	/**If not PRINT**/	
+						{
+							skip_spaces(&cmdLine);
+							if (*cmdLine != ',') /**check_comma**/
+								printf("Missing comma\n");
+							else /**found a comma**/
+							{
+								cmdLine++;
+								skip_spaces(&cmdLine);
+								if (*cmdLine == ',') /**check for multiple commas**/
+									printf("Multiple consecutive commas\n");
+								else /**valid comma strike**/
+								{
+									if (strcmp(funcName, "read_set") == 0)	/**if READ**/
+									{
+										if (get_numList(setToRead, &cmdLine) == SUCCESS)/**if legal numList**/	
+											read_set(setIndex1, sets, setToRead);/**do READ**/
+									}	
+									else /**if UNION or SUB or INTERSECT or SYMDIFF**/
+									{	
+										setIndex2 = get_setName(&cmdLine);/**get the 2nd parameter in input line, save its index in the SET array**/
+										if (setIndex2 != ERROR) /**get valid name of 2nd set**/
+										{
+											/**check_comma and remove spaces**/
+											skip_spaces(&cmdLine);
+											if (*cmdLine != ',') /**check_comma**/
+												printf("Missing comma\n");
+											else /**found  a comma**/
+											{
+												cmdLine++;
+												skip_spaces(&cmdLine);
+												if (*cmdLine == ',') /**check for multiple commas**/
+													printf("Multiple consecutive commas\n");
+												else /**valid comma strike**/
+												{
+													setIndex3 = get_setName(&cmdLine); /**get the 3rd parameter in input line, save its index in the SET array**/
+													if (setIndex3 != ERROR) /**get valid name of 3rd set**/
+													{
+														if(legal_EOL(&cmdLine) == SUCCESS) /**valid end of line**/
+														{
+															if (strcmp(funcName, "union_set") == 0) /**if UNION**/
+																union_set(setIndex1, setIndex2, setIndex3, sets); /**do UNION**/
+															else /**If not UNION**/
+															{
+																if (strcmp(funcName, "intersect_set") == 0) /**if INTERSECT**/
+																	intersect_set(setIndex1, setIndex2, setIndex3, sets); /**do INTERSECT**/
+																else /**If not INTERSECT**/
+																{
+																	if (strcmp(funcName, "sub_set") == 0) /**if SUB**/
+																		sub_set(setIndex1, setIndex2, setIndex3, sets); /**do SUB**/
+																	else /**If not SUB**/
+																		if (strcmp(funcName, "symdiff_set") == 0) /**if SYMDIFF**/
+																			symdiff_set(setIndex1, setIndex2, setIndex3, sets);/**do SYMDIFF**/
+																}/**End not INTERSECT**/
+															}/**End not UNION**/
+														}/** End valid end of line**/
+													}/**End get valid name of 3rd set**/
+												}/**End valid comma strike**/
+											}/**End valid comma**/
+										}/**End get valid name of 2nd set**/
+									}/**End UNION or SUB or INTERSECT or SYMDIFF**/
+								}/**End valid comma strike**/
+							} /**End valid comma**/
+						} /**End not PRINT**/
+						else /**if PRINT**/
+						{
+							if(legal_EOL(&cmdLine) == SUCCESS) /**valid end of line**/
+								print_set(setIndex1, sets); /**do PRINT**/
+						}		
+				}/**End get valid name of 1st SET**/
+			} /**End not STOP**/
+			else /**if STOP**/
+			{
+				if(legal_EOL(&cmdLine) == SUCCESS) /**valid end of line**/
+					stop(); /**do STOP**/
+			}
+		}/**End get valid command type**/
+	}/**end of while**/
+	return 0;
+}/**End of main**/
+
+/**analyzes the command line and checks if it is legal**/
+
+/**get_numList:
+sacn the input line (without the function name) character by character and analyzes the list of number which the user insert after READ.
+checks if it fits to the format int, int,.....,-1 (ignore white spaces).
+after each number which is found, make the bit in the array, which is in the same place as the number value, to 1.
+if there is an error, print an appropriate error massege and return ERROR.
+else, save the numbers in the array and return SUCCESS.
+
+parameters: newSetValue- represent the numbers to insert to SET. Each number is represented by bits- array of 128 bits, if the number exists the bit is 1, else is 0
+			cmdLine- a pointer to the pointer to the current character to read in the input line. Is promoted while scaning the list of numbers
+
+return: SUCCESS if the list of number is ilegal, ERROR otherwise.
+
+output: an appropriate error massege if there is an error in the list of numbers**/
+int get_numList(int newSetValue[],char **cmdLine)
+{
+	char *pch; /**pointer which help to read a number every time (before a space or a comma) and promote cmdLine**/
+	char *num; /**pointer which contains the string representation of each number in the list.**/
+	int i, numLength;
+	unsigned int mask; /**vraible which help to save in the array that the number is exsits in the list**/
+	/**initialize the array to 0 and for numLength**/
+	for (i = 0; i<NUMBERS_ARRAY_LENGTH; i++)
+	{		
+		newSetValue[i] = 0;	
+	}
+	numLength = 0;
+	num = (char *)malloc(MAXLINE*sizeof(char));/**allocate place in the memory for num**/
+	while(**cmdLine != '\n')/**while the input line isn't finished, scan the list**/
+	{	
+		skip_spaces(cmdLine);
+		if(**cmdLine == '-') /**if there is a hyphen (maybe a minus sign) in the list of numbers**/
+		{
+			(*cmdLine)++; /**move to the next character in the input**/
+			if(**cmdLine == '1') /**if the user insert -1**/
+			{
+				(*cmdLine)++; /**move to the next character in the input**/
+				if(legal_EOL(cmdLine) != SUCCESS) /**if the list is not finished**/
+					return ERROR;
+				/**valid list of number**/
+				return SUCCESS; /**finish with success**/
+			}	
+			else /**the user didnt insert '-', but not '-1', error**/
+			{
+				if(isdigit(**(cmdLine++))) /**the user insert negative number**/
+					printf("Invalid set member - value out of range\n");
+				else /**the user insert a character which is not a number**/
+					printf("- Invalid set member - not an integer\n");
+				return ERROR; 
+			}
+		}
+		else /**the user didnt insert a hyphen**/
+		{
+			memset(num, '\0', strlen(num)); /**initialize the num pointer, to aviod junk cells**/
+			pch = strpbrk(*cmdLine," \t\n,"); /**find the first character in the input line which is a white space or a comma**/
+			strncpy(num, *cmdLine, (pch - *cmdLine)); /**insert the string which comes before the character in pch to num**/
+			*cmdLine = pch; /**promote cmdLine to after the string**/
+			numLength = strlen(num);/**save the length of the number which was found**/
+			/**scan all the string to check if it is a legal number**/			
+			for(i=0;i<numLength;i++,num++)
+			{
+				if(!isdigit(*num)) /**if the current character is not a digit, error*/
+				{
+					printf("Invalid set member - not an integer\n");
+					return ERROR;
+				}	
+			}
+			if(atoi(num) > MAXNUMBER) /**the number is out of the range [0..127], error**/
+			{
+				printf("Invalid set member - value out of range\n");
+				return ERROR;
+			}
+			else /**a legal number in the list**/
+			{
+				mask = 1<<((sizeof(int)*8-1)-(atoi(num)%(sizeof(int)*8))); /**mask is all 0 bits exept the bit in the place num, which is 1**/
+				newSetValue[(int)(atoi(num)/(sizeof(int)*8))] = newSetValue[(int)(atoi(num)/(sizeof(int)*8))]|mask; /**mark in newSetValue that "num" was inserted**/
+			}
+		}
+		skip_spaces(cmdLine);
+		if (**cmdLine == '\n')/**the list finish without -1, error**/
+		{
+			printf("List of set members is not terminated correctly\n");
+			return ERROR;
+		}
+		if (**cmdLine != ',') /**there is not a comma between two numbers, error**/
+		{
+			printf("Missing comma\n");
+			return ERROR;
+		}
+		(*cmdLine)++; /**move to the next character**/
+		skip_spaces(cmdLine);
+		if (**cmdLine == ',') /**multiple commas, error**/
+		{
+			printf("Multiple consecutive commas\n");
+			return ERROR;
+		}
+	}
+	printf("List of set members is not terminated correctly\n");/**didnt finish with success, so finish with error**/
+	return ERROR; 
+
+}
+
+/**get_setName:
+sacn the input line (without the function name) character by character and analyzes the name of SET which the user insert after the function name.
+checks if this is a name of a SET that exists and if the format is legal (commas ect.).
+if there is an error, print an appropriate error massege and return ERROR.
+else, return the index of the SET in the SET array.
+
+parameters: cmdLine - a pointer to the pointer to the current character to read in the input line. Is promoted after scanning the SET name.
+
+return: the index of the SET if the SET name is ilegal and exists, ERROR otherwise.
+
+output: an appropriate error massege if there is an error or if that SET doesn't exist**/
+int get_setName(char** cmdLine)
+{
+	char *pch; /**pointer which help to read the SET name and promote cmdLine**/
+	char *NameOfSet; /**a string to get the SET name which was inserted**/
+	int setIndex; /**the index of the SET in the array SET**/
+	NameOfSet = (char *)malloc(MAXLINE*sizeof(char)); /**allocate place in the memory for NameOfSet**/
+	
+	skip_spaces(cmdLine);
+	if (**cmdLine == ',') /**if there is a comma before the SET name, error**/
+	{
+		printf("Illegal comma\n");
+		return ERROR;
+	}
+	if (**cmdLine == '\n') /**if there is no SET name, error**/
+	{
+		printf("Missing parameter\n");
+		return ERROR;
+	}
+	pch = strpbrk(*cmdLine," \t\n,"); /**find the first character in the input line which is a white space or a comma**/
+	strncpy(NameOfSet, *cmdLine, (pch - *cmdLine)); /**insert the string which comes before the character in pch to NameOfSet**/
+	*cmdLine = pch; /**promote cmdLine to after the string**/
+	
+	/**save in setIndex the index if the SET name which was insered is a name of a SET in SET array, save ERROR and print an error massege otherwise**/
+	if(strcmp(NameOfSet, "SETA") == 0)
+		setIndex = 0;
+	else
+		if(strcmp(NameOfSet, "SETB") == 0)
+			setIndex = 1;
+		else
+			if(strcmp(NameOfSet, "SETC") == 0)
+				setIndex = 2;
+			else
+				if(strcmp(NameOfSet, "SETD") == 0)
+					setIndex = 3;
+				else
+					if(strcmp(NameOfSet, "SETE") == 0)
+						setIndex = 4;
+					else
+						if(strcmp(NameOfSet, "SETF") == 0)
+							setIndex = 5;
+						else	
+						{
+							printf("Undefined set name\n");
+							setIndex = ERROR;
+						}
+	return setIndex;/**ERROR or index (0-5)**/
+}
+
+/**get_funcName:
+sacn the input line character by character and analyzes the function name which the user insert.
+checks if this is a name of an existed fuction and if the format is legal (commas ect.).
+if there is an error, print an appropriate error massege and return ERROR.
+else, save the function name and return SUCCESS.
+
+parameters: cmdLine - a pointer to the pointer to the current character to read in the input line. Is promoted after scanning the SET name.
+			funcName - a string to contain the funcion name (after analyzing).
+
+return: SUCCESS if the function name is valid and exist, ERROR otherwise.
+
+output: an appropriate error massege if there is an error or if that function doesn't exist**/
+int get_funcName(char** funcName, char** cmdLine)
+{
+	char *pch; /**pointer which help to read the function name and promote cmdLine**/
+	
+	skip_spaces(cmdLine);
+	if (**cmdLine == ',') /**if there is a comma before the function name, error**/
+	{
+		printf("Illegal comma\n");
+		return ERROR;
+	}
+	if (**cmdLine == '\n') /**if there is no function name, error**/
+	{
+		return ERROR;
+	}
+	pch = strpbrk(*cmdLine," \t\n,"); /**find the first character in the input line which is a white space or a comma**/
+	strncpy(*funcName, *cmdLine, (pch - *cmdLine)); /**insert the string which comes before the character in pch to funcName**/
+	*cmdLine = pch; /**promote cmdLine to after the string**/
+
+	/**if(*pch == ',') 
+	{
+		printf("Illegal comma\n");
+		return ERROR;
+	}
+	**/
+	/**if the function name which was insered is not a name of a function that exists, error**/
+	if ((strcmp(*funcName,"stop") != 0) && (strcmp(*funcName,"read_set") != 0) && (strcmp(*funcName,"print_set") != 0) && (strcmp(*funcName,"union_set") != 0) && (strcmp(*funcName,"intersect_set") != 0) && (strcmp(*funcName,"sub_set") != 0) && (strcmp(*funcName,"symdiff_set") != 0))
+	{
+		printf("Undefined command name\n");
+		return ERROR;
+	}
+	return SUCCESS; /**the function name is legal and exist**/
+}
+/**skip white spaces.
+parameter: cmdLine - a pointer to a pointer to the input line, which is promote as long as the character in the line is a white space**/
+void skip_spaces(char **cmdLine)
+{
+	while((**cmdLine == ' ')||(**cmdLine == '\t'))
+		(*cmdLine)++;
+}
+
+/**check if the end of the line is legal - doesn't contain any characters which are not a white space
+
+parameter: cmdLine - a pointer to a pointer to the input line, to scan the end of the line.
+
+return: ERROR if the end of the line is ilegal, SUCCESS otherwise**/
+int legal_EOL(char ** cmdLine)
+{
+	while(**cmdLine != '\n') /**while it isn't the last character in the**/
+	{
+		if((**cmdLine == ' ')||(**cmdLine == '\t'))/**if it is a white space, move to the next character**/
+			(*cmdLine)++;
+		else /**if the character isn't a white space, error**/
+		{
+			printf("Extraneous text after end of commamd\n");
+			return ERROR;
+		}
+	}
+	return SUCCESS; /**leagl end of line**/
+}
+
+

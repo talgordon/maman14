@@ -1,9 +1,32 @@
 #include "analize_input_line.h"
-#include "analize_code_word.h"
 #include "error.h"
+#include "label.h"
+char * buf[1000];
+int main(int argc, char * argv[])
+{
+	char * line;
+	int * srcType;
+	int * dstType;
+	char * srcName;
+	char * dstName;
+	char * word;
 
+	init();
+	srcType = (int *)malloc(sizeof(int));
+	dstType = (int *)malloc(sizeof(int));
+	srcName = (char *)malloc(sizeof(char)*40);
+	dstName = (char *)malloc(sizeof(char)*40);
+	printf("start run\n");
+	get_line(argc, argv);
+	printf("finish get_line\n");
+	printf("line:%s\n", buf[line_num]);
+	get_word(&buf[line_num], &word);
+	get_operand(line, srcType,dstType,&srcName,&dstName);
+	return 0;
+}
 void init()
 {
+	int i;
 	addressTable[0].src = 15;
 	addressTable[0].dst = 7;
 	addressTable[1].src = 15; 
@@ -35,10 +58,19 @@ void init()
 	addressTable[14].src = 0;
 	addressTable[14].dst = 0;
 	addressTable[15].src = 0;
-	addressTable[15].dst = 0; 
+	addressTable[15].dst = 0;
+
+	for(i = 0; i<1000; i++)	
+	{
+		buf[i] = (char *)malloc(sizeof(char)*40);
+		strcpy(buf[i], "empty line");	
+	}
+
+	line_num = 0;
+
 }
 
-char * buf[1000];
+
 void get_line(int argc, char * argv[])
 {
 	FILE *ptr;
@@ -51,9 +83,11 @@ void get_line(int argc, char * argv[])
 			exit(1);
 		}
 		line_num = 0;
+		memset(buf[line_num], '\0', strlen(buf[line_num])); 
 		while(!feof(ptr))
 		{
-			fscanf(ptr, "%s", buf);	
+			fscanf(ptr, "%s", buf[line_num]);
+			printf("%s\n", buf[line_num]);	
 			line_num++;
 		}
 		fclose(ptr);
@@ -166,12 +200,12 @@ int has_label(char * line)
 	return 1;
 }
 
-types get_word(char ** line, char ** word)
+types get_word(char * line[40], char ** word)
 {
 	char * pch;
 	char * str=NULL;
 	skip_spaces(line);
-	if (**line == "\n")
+	if ((**line) == "\n")
 	{
 		return END;	
 	}
@@ -183,11 +217,11 @@ types get_word(char ** line, char ** word)
 		return LABEL;
 	}
 
-	skip_spaces(&line);
+	skip_spaces(line);
 
-	if (line[0]=='.')/*check if is data/string/extern/entry*/
+	if ((*line[0]) == '.')/*check if is data/string/extern/entry*/
 	{
-		if(strcmp(line,".data")==0)
+		if(strcmp(*line,".data")==0)
 		{
 			pch=(strpbrk(*line," \t\n,"));
 			strncpy(*word,*line,(pch-*line));
@@ -195,7 +229,7 @@ types get_word(char ** line, char ** word)
 			return DATA;
 		}
 
-		else if(strcmp(line,".string")==0)
+		else if(strcmp(*line,".string")==0)
 		{
 			pch=(strpbrk(*line," \t\n,"));
 			strncpy(*word,*line,(pch-*line));
@@ -203,7 +237,7 @@ types get_word(char ** line, char ** word)
 			return STRING;
 		}
 
-		else if(strcmp(line,".extern")==0)
+		else if(strcmp(*line,".extern")==0)
 		{
 			pch=(strpbrk(*line," \t\n,"));
 			strncpy(*word,*line,(pch-*line));
@@ -211,7 +245,7 @@ types get_word(char ** line, char ** word)
 			return EXTERN;
 		}
 
-		else if(strcmp(line,".entry")==0)
+		else if(strcmp(*line,".entry")==0)
 		{
 			pch=(strpbrk(*line," \t\n,"));
 			strncpy(*word,*line,(pch-*line));
@@ -228,9 +262,10 @@ types get_word(char ** line, char ** word)
 void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char ** dstName)
 {
 	labelPtr label;
-	label=(labelPtr)malloc(sizeof(label));
 	char * pch;
-	char * str=NULL;
+	char * str;
+	str = NULL;
+	label=(labelPtr)malloc(sizeof(label));
 	skip_spaces(&line);
 	switch(*line)
 	{
@@ -333,17 +368,4 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 }
 
 
-int main(int argc, char * argv[])
-{
-	char * line;
-	int * srcType=1;
-	int * dstType=2;
-	char * srcName=srcName;
-	char * dstName=dstName;
-	bufIndex = 0;
 
-	get_line(argc, argv);
-	get_word(buf);
-	get_operand(line, srcType,dstType,srcName,dstName);
-	return 0;
-}

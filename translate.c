@@ -1,5 +1,5 @@
-#include "translate.h"
 #include "error.h"
+#include "binary.c"
 #include "analize_code_word.h"
 int write_data_image(dataWord dWord)
 {	
@@ -41,7 +41,7 @@ int write_data_image(dataWord dWord)
 
 int write_code_image(wordPtr ptr, int type)
 {
-	IC = 100;
+	IC = 0;
 	switch (type)
 	{
 		case (CODE_WORD):
@@ -76,11 +76,11 @@ int print_mem()
 {
 	memWordPtr tmp;
 	int i;
-	for (i = 100; i < (IC + 100); i++)
+	for (i = 100; i <= (IC + 100); i++)
 	{
 		printf("\n%d\t%o", i, buffer[i-100]);
 	}
-	tmp = (memWordPtr)malloc(sizeof(label));
+	tmp = (memWordPtr)malloc(sizeof(memWord));
 	if(tmp == NULL)
 	{
 		error_check("ALLOCATE");
@@ -114,7 +114,7 @@ int main()
 	wordC.dst = 2;
 	wordC.ARE = 4;
 	ptr.codeWordPtr = &wordC;
-	write_code_image(ptr, CODE);
+	write_code_image(ptr, CODE_WORD);
 	print_mem();
 	return 0;	
 }**/

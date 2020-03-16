@@ -51,19 +51,29 @@ typedef union wordType{
 /**memory word, with the value and address (and the next word for the inked list)**/
 
 
-typedef struct addressMethod *addrMethodPtr;
 
-typedef struct addressMethod{
-	unsigned int src : 4;
-	unsigned int dst : 4;
-}addressMethod;
+typedef struct memWord* memWordPtr;
+
+typedef struct memWord{
+	unsigned int word;
+	unsigned int index;
+	memWordPtr next;
+}memWord;
+
+enum types{CODE_WORD, DATA_WORD, DATA_REG_WORD};
+int DC, IC, L;
+
+memWordPtr dataHead;
+
+unsigned int buffer[4096];
+
+int write_data_image(dataWord dWord);
+int write_code_image(wordPtr ptr, int type);
+int print_mem();
 
 int find_opcode(char * opcode);
-
 int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType, char *srcName, char* dstName);
-
 int finish_translate(char *line, wordPtr wPtr);
-
 int translate_data(int type, char * line);
 
 

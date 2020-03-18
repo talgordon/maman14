@@ -10,7 +10,8 @@ int main(int argc, char * argv[])
 	char * srcName;
 	char * dstName;
 	char * word;
-
+	word = (char *)malloc(10*sizeof(char));
+	line = (char *)malloc(sizeof(char));
 	init();
 	srcType = (int *)malloc(sizeof(int));
 	dstType = (int *)malloc(sizeof(int));
@@ -21,7 +22,7 @@ int main(int argc, char * argv[])
 	printf("finish get_line\n");
 	printf("line:%s\n", buf[line_num]);
 	get_word(&buf[line_num], &word);
-	get_operand(line, srcType,dstType,&srcName,&dstName);
+	get_operand(buf[7], srcType,dstType,&srcName,&dstName);
 	return 0;
 }
 void init()
@@ -67,28 +68,28 @@ void init()
 	}
 
 	line_num = 0;
-
 }
 
 
 void get_line(int argc, char * argv[])
 {
 	FILE *ptr;
-	int i;
-	for (i=0; i<argc; i++)
+	int i, index;
+	for (i=1; i<argc; i++)
 	{	
 		if((ptr = fopen(argv[i], "r")) == NULL)
 		{
 			error_check("CANNOT_OPEN_FILE");
 			exit(1);
 		}
-		line_num = 0;
-		memset(buf[line_num], '\0', strlen(buf[line_num])); 
-		while(!feof(ptr))
+		index = 0;
+		memset(buf[index], '\0', strlen(buf[index]));
+		
+		while(fgets(buf[index], sizeof(buf), ptr)!=NULL)
 		{
-			fscanf(ptr, "%s", buf[line_num]);
-			printf("%s\n", buf[line_num]);	
-			line_num++;
+			fputs(*buf,stdout);
+			fputs("",stdout);
+			index++;
 		}
 		fclose(ptr);
 	}
@@ -144,7 +145,7 @@ int get_data(char **line)
 	int i, numLength, sign;
 	sign = 1;
 	numLength = 0;
-	num = (char *)malloc(10*sizeof(char));/**allocate place in the memory for num**/
+	num = (char *)malloc(10*sizeof(char));/**allocate place in the memory for num**/	
 	while(**line != '\n')/**while the input line isn't finished, scan the list**/
 	{	
 		skip_spaces(line);
@@ -202,13 +203,16 @@ int has_label(char * line)
 
 types get_word(char * line[40], char ** word)
 {
+	
 	char * pch;
 	char * str=NULL;
 	skip_spaces(line);
-	if ((**line) == "\n")
+	printf("%d\n",1);
+	if ((**line) == '\n')
 	{
 		return END;	
 	}
+		printf("%d\n",2);
 	if(!(has_label(*line)))/*check if is label*/
 	{
 		pch=(strpbrk(*line," \t\n,"));
@@ -216,9 +220,8 @@ types get_word(char * line[40], char ** word)
 		*line=pch;
 		return LABEL;
 	}
-
+	printf("%d\n",3);
 	skip_spaces(line);
-
 	if ((*line[0]) == '.')/*check if is data/string/extern/entry*/
 	{
 		if(strcmp(*line,".data")==0)
@@ -234,7 +237,9 @@ types get_word(char * line[40], char ** word)
 			pch=(strpbrk(*line," \t\n,"));
 			strncpy(*word,*line,(pch-*line));
 			*line=pch;
+		printf("%d\n",4);
 			return STRING;
+
 		}
 
 		else if(strcmp(*line,".extern")==0)
@@ -252,9 +257,11 @@ types get_word(char * line[40], char ** word)
 			*line=pch;
 			return ENTRY;
 		}
+	printf("%d\n",5);
 	}
 	pch=(strpbrk(*line," \t\n,"));
 	strncpy(*word,*line,(pch-*line));
+	printf("%d\n",6);
 	*line=pch;
 	return OTHER;
 }
@@ -264,11 +271,16 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 	labelPtr label;
 	char * pch;
 	char * str;
-	str = NULL;
+	/*str = NULL;*/
 	label=(labelPtr)malloc(sizeof(label));
 	skip_spaces(&line);
+	printf("%s\n",line);
+	printf("%d\n",7);
+	if (*line == '\n');
+		return;
 	switch(*line)
 	{
+	printf("%d\n",8);
 		case '#':
 		{
 			*srcType=1;
@@ -283,7 +295,8 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 			pch=(strpbrk(line," \t\n,"));
 			strncpy(str,line,(pch-line));
 			line=pch;
-			strcpy(*srcName, (str+1));    
+			strcpy(*srcName, (str+1));
+	printf("%d\n",9);    
 		}
  		
 		default :
@@ -310,13 +323,16 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 					error_check("LINE INVALID");
 				}
 			}
+	printf("%d\n",10);
 		}
 	}
 
 	comma_logic(&line);
 	line++;
 	skip_spaces(&line);
-
+	printf("%d\n",11);
+	if (*line == '\n');
+		return;
 	switch(*line)
 	{
 		case '#':
@@ -326,7 +342,7 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 			strncpy(*dstName,line,(pch-line));
 			line=pch;
 		}
-
+	printf("%d\n",12);
 		case '*':
 		{
 		    *dstType=4;
@@ -360,11 +376,11 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 					error_check("LINE INVALID");
 				}
 			}
+			
 		}
 	}
-
+	printf("%d\n",13);
 	legal_EOL(&line);
-
 }
 
 

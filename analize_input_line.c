@@ -22,7 +22,7 @@ int main(int argc, char * argv[])
 	printf("finish get_line\n");
 	printf("line:%s\n", buf[line_num]);
 	get_word(&buf[line_num], &word);
-	get_operand(buf[7], srcType,dstType,&srcName,&dstName);
+	get_operand(buf[line_num], srcType,dstType,&srcName,&dstName);
 	return 0;
 }
 void init()
@@ -74,7 +74,7 @@ void init()
 void get_line(int argc, char * argv[])
 {
 	FILE *ptr;
-	int i, index;
+	int i;
 	for (i=1; i<argc; i++)
 	{	
 		if((ptr = fopen(argv[i], "r")) == NULL)
@@ -82,14 +82,13 @@ void get_line(int argc, char * argv[])
 			error_check("CANNOT_OPEN_FILE");
 			exit(1);
 		}
-		index = 0;
-		memset(buf[index], '\0', strlen(buf[index]));
+		line_num = 0;
+		memset(buf[line_num], '\0', strlen(buf[line_num]));
 		
-		while(fgets(buf[index], sizeof(buf), ptr)!=NULL)
+		while(fgets(*buf, sizeof(buf), ptr)!=NULL)
 		{
 			fputs(*buf,stdout);
 			fputs("",stdout);
-			index++;
 		}
 		fclose(ptr);
 	}

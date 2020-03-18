@@ -61,7 +61,6 @@ typedef struct memWord{
 }memWord;
 
 enum types{CODE_WORD, DATA_WORD, DATA_REG_WORD};
-int DC, IC, L;
 
 memWordPtr dataHead;
 
@@ -72,7 +71,7 @@ int write_code_image(wordPtr ptr, int type);
 int print_mem();
 
 int find_opcode(char * opcode);
-int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType, char *srcName, char* dstName);
+int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType);
 int finish_translate(char *line, wordPtr wPtr);
 int translate_data(int type, char * line);
 

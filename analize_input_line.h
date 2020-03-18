@@ -1,4 +1,5 @@
 #include <ctype.h>
+#define MAX_WORD 40
 	
 unsigned int DC = 0;
 unsigned int IC = 0;
@@ -21,7 +22,7 @@ void legal_EOL(char ** line);
 void comma_logic(char **line);
 void init();
 int get_data(char **line);
-int has_label(char * line);
+int is_label(char * line);
 types get_word(char * line[], char ** word);
 void get_operand(char * line, int * srcType, int *dstType, char ** srcName, char ** dstName);
 

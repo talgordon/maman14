@@ -1,6 +1,7 @@
 #include "analize_code_word.h"
 #include "analize_input_line.h"
 #include "error.h"
+#include "label.h"
 #define MAX_WORDS 4096
 #define A 4
 #define R 2
@@ -10,8 +11,28 @@
 #define INDIRECT_REGISTER 4
 #define DIRECT_REGISTER 8
 
-const char * opcodeTable[16] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 
+
+int main()
+{
+	wordPtr wordP;
+	int opcode, srcType, dstType;
+	char * line;
+	line = (char *)malloc(sizeof(char)*MAX_WORD);
+	strcpy(line, "	#48, 	*r6");	
+	opcode = find_opcode("add");
+	srcType = 2;
+	dstType = 4;
+	translate_code(wordP, opcode, srcType, dstType);
+
+	finish_translate(line, wordP);
+
+	strcpy(line, "	abcd");
+	translate_data(STRING, line);
+	print_mem();
+	return 0;	
+}
+const char * opcodeTable[16] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 int find_opcode(char * opcode)
 {
 	int i;
@@ -24,19 +45,20 @@ int find_opcode(char * opcode)
 	return -1;
 }
 
-int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType, char * srcName, char * dstName)
+int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
 {
 	codeWord firstWord;
+	int numOfOp_table, numOfOp_line;
 	/**get the opcode - first 4 bits in the word**/
 	firstWord.opcode = opcode;
 
 	/**get the address method - next 8 bits in the word**/
-	int numOfOp_table, numOfOp_line;
+	
 	numOfOp_table = 0;
 	numOfOp_line = 0;
-	if (addressTable.src != 0)
+	if (addressTable->src != 0)
 		numOfOp_table++;
-	if (addressTable.dst != 0)
+	if (addressTable->dst != 0)
 		numOfOp_table++;
 	if (srcType != 0)
 		numOfOp_line++;
@@ -81,9 +103,9 @@ int finish_translate(char *line, wordPtr wPtr)
 		{
 			labelPtr label;
 			label = (labelPtr)malloc(sizeof(label));
-			get_label(srcName, 0, 0, label);
-			srcInfo.data = label->value;
-			if(label->type == EXTERN)
+			get_label(srcName, 0, 0, &label);
+			srcInfo.data = label->labelValue;
+			if(label->labelType == EXTERN)
 				srcInfo.ARE = E;
 			else
 				srcInfo.ARE = R;
@@ -117,9 +139,9 @@ int finish_translate(char *line, wordPtr wPtr)
 		{
 			labelPtr label;
 			label = (labelPtr)malloc(sizeof(label));
-			get_label(dstName, 0, 0, label);
-			dstInfo.data = label->value;
-			if(label.type == EXTERN)
+			get_label(dstName, 0, 0, &label);
+			dstInfo.data = label->labelValue;
+			if(label->labelType == EXTERN)
 				dstInfo.ARE = E;
 			else
 				dstInfo.ARE = R;
@@ -147,7 +169,7 @@ int translate_data(int type, char * line)
 	int num, c;
 	if (type == DATA)
 	{
-		while((num = get_data(line))!=EOF)
+		while((num = get_data(&line))!=EOF)
 		{
 			word.data = two_comlement(num);
 			write_data_image(word);

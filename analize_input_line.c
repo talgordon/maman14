@@ -50,28 +50,27 @@ void init()
 	L = 0;
 }
 
-
+/*A function that reads a line from the input file.*/
 void get_line(int argc, char * argv[])
 {
 	FILE *ptr;
 	int i, index;
-	for (i=1; i<argc; i++)
+	for (i=1; i<argc; i++)/*Loop that run until the file was read*/
 	{	
-		if((ptr = fopen(argv[i], "r")) == NULL)
+		if((ptr = fopen(argv[i], "r")) == NULL)/*Check if the file is empty-print error and exit*/
 		{
 			error_check("CANNOT_OPEN_FILE");
 			exit(1);
 		}
 		index = 0;
 		memset(buf[index], '\0', strlen(buf[index]));
-		
-		while(fgets(buf[index], sizeof(buf), ptr)!=NULL)
+		while(fgets(buf[index], sizeof(buf), ptr)!=NULL)/*Income the line in the file into an array called buf and magnification the index*/
 		{
 			fputs(buf[index],stdout);
 			fputs("",stdout);
 			index++;
 		}
-		fclose(ptr);
+		fclose(ptr);/*Close the file*/
 	}
 }
 
@@ -99,14 +98,15 @@ void legal_EOL(char ** line)
 	}
 }
 
+/*A function that checks for a comma or not and advances the line accordingly*/
 void comma_logic(char **line)
 {
 	skip_spaces(line);
-	if (**line != ',') /**check_comma**/
+	if (**line != ',') /*check_comma*/
 	{
 		error_check("LINE_INVALID");
 	}
-	else /**found a comma**/
+	else /*found a comma*/
 	{
 		(*line)++;
 		skip_spaces(line);
@@ -167,21 +167,22 @@ int get_data(char **line)
 }
 
 
-int is_label(char * line)
+int is_label(char * line)/*A function that check if the line is label and return 0/1*/
 {
 	printf("in is label\n");
-	while (!(isspace(*line)))
+	while (!(isspace(*line)))/*Skipping all the profits*/
 	{
-		if (*line == ':')
+		if (*line == ':')/*If is label*/
 		{
 			if(isspace(*(++line)))
 				return 0;	
 		}
 		line++;
 	}
-	return 1;
+	return 1;/*if is not a label*/
 }
 
+/*A function that analize an input line. Reads a first word from the line to the space and returns an enum according to the type it has inserted*/
 types get_word(char * line[40], char ** word)
 {
 	
@@ -190,11 +191,11 @@ types get_word(char * line[40], char ** word)
 	memset(*word, '\0', strlen(*word));
 	printf("in get word, line:%s\n", *line);
 	skip_spaces(line);
-	if ((**line) == '\n')
+	if ((**line) == '\n')/*Check if is end of the line-return END*/
 	{
 		return END;	
 	}
-	if((is_label(*line)) == 0)/*check if is label*/
+	if((is_label(*line)) == 0)/*Check if is label-return LABEL*/
 	{
 		pch=(strpbrk(*line," \t\n,"));
 		strncpy(*word,*line,(pch-*line));
@@ -208,18 +209,18 @@ types get_word(char * line[40], char ** word)
 	if (**word == '.')/*check if is data/string/extern/entry*/
 	{
 		printf("there is . in the word\n");
-		if(strcmp(*word,".data")==0)
+		if(strcmp(*word,".data")==0)/*Check if is data-return DATA*/
 		{
 			return DATA;
 		}
 
-		else if(strcmp(*word,".string")==0)
+		else if(strcmp(*word,".string")==0)/*Check if is string-return STRING*/
 		{
 			return STRING;
 
 		}
 
-		else if(strcmp(*word,".extern")==0)
+		else if(strcmp(*word,".extern")==0)/*Check if is extrn-return EXTERN*/
 		{
 			return EXTERN;
 		}
@@ -229,9 +230,10 @@ types get_word(char * line[40], char ** word)
 			return ENTRY;
 		}
 	}
-	return CODE;
+	return CODE;/*If is not label/data/string/extern/entry-it is opcode-return CODE*/
 }
 
+/*A function that analize a aline from the input, reads the operands in the */
 void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char ** dstName)
 {
 	labelPtr label;

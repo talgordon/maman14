@@ -1,12 +1,5 @@
 #include "error.h"
-/**
-int main()
-{
-	error_check("ALLOCATE");
-	error_check("UNEXISTED");
-	error_check("ALLOCATE");
-	return 0;
-}**/
+
 void error_check(char *err)
 {
 	set_flag("ERROR", 1);

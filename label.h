@@ -1,3 +1,4 @@
+#define NO_ADDRESS 0
 typedef struct label * labelPtr;
 typedef struct label
 {
@@ -15,6 +16,6 @@ labelPtr label_head;
 
 void add_label(char * name, int value, int type);
 void get_label(char *name, int feature, int featureType, labelPtr* label);
-int update_label(int update, int updateType, char *name);
+int update_label(int update, int updateType, int labelValue, char *name);
 void print_label();
 

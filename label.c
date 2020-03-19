@@ -110,7 +110,7 @@ void get_label(char *name, int feature, int featureType, labelPtr* label)
 	error_check("UNEXISTED");
 }
 
-int update_label(int update, int updateType, char *name)
+int update_label(int update, int updateType, int labelType, char *name)
 {
 	labelPtr tmp;
 	tmp = (labelPtr)malloc(sizeof(label));
@@ -122,11 +122,11 @@ int update_label(int update, int updateType, char *name)
 	tmp = label_head;
 	while(tmp != NULL)
 	{
-		if(strcmp(tmp->labelName, name) == 0)
+		if((strcmp(tmp->labelName, name) == 0)||(strcmp(name, "ALL") == 0)&&(tmp->labelType == labelType))
 		{
 			if(updateType == LABEL_VALUE)
 			{
-				tmp->labelValue = update;
+				tmp->labelValue+= update;
 				return SUCCESS;
 			}
 			if(updateType == LABEL_TYPE)

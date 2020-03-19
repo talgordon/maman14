@@ -20,10 +20,10 @@ typedef struct error{
 }error;
 
 errorPtr error_head;
-enum errType{ALLOCATE, UNEXISTED, FLAG_NOT_EXIST,CANNOT_OPEN_FILE, LINE_INVALID, INVALID_DATA, OPCODE};
+enum errType{ALLOCATE, UNEXISTED, FLAG_NOT_EXIST,CANNOT_OPEN_FILE, LINE_INVALID, INVALID_DATA, OPCODE, UNDEFINE_WORD};
 	
 PSW_hold PSW;
-int line_num;
+extern int line_num;
 void error_check(char *err);
 void add_error(int type);
 void print_error();

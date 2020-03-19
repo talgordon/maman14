@@ -11,27 +11,6 @@
 #define INDIRECT_REGISTER 4
 #define DIRECT_REGISTER 8
 
-
-
-int main()
-{
-	wordPtr wordP;
-	int opcode, srcType, dstType;
-	char * line;
-	line = (char *)malloc(sizeof(char)*MAX_WORD);
-	strcpy(line, "	#48, 	*r6");	
-	opcode = find_opcode("add");
-	srcType = 2;
-	dstType = 4;
-	translate_code(wordP, opcode, srcType, dstType);
-
-	finish_translate(line, wordP);
-
-	strcpy(line, "	abcd");
-	translate_data(STRING, line);
-	print_mem();
-	return 0;	
-}
 const char * opcodeTable[16] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 int find_opcode(char * opcode)
 {
@@ -89,17 +68,23 @@ int finish_translate(char *line, wordPtr wPtr)
 	int dstType;
 	srcType = 0;
 	dstType = 0;
-	get_operands(line, &srcName, &srcType, &dstName, &dstType);
+	get_operand(line, &srcType, &dstType, &srcName, &dstName);
 	/**get the info words, one, two or non at all**/	
+	if(dstType == 0)
+	{
+		return 0;
+	}
+	L++;
 	if((srcType == IMMEDIATE) || (srcType == DIRECT))
 	{
 		infoWordData srcInfo;
+		L++;
 		if(srcType == IMMEDIATE)
 		{
 			srcInfo.data = two_complement(atoi(srcName));
 			srcInfo.ARE = A;
 		}
-		else
+		else/*direct*/
 		{
 			labelPtr label;
 			label = (labelPtr)malloc(sizeof(label));
@@ -121,7 +106,10 @@ int finish_translate(char *line, wordPtr wPtr)
 		if ((dstType == INDIRECT_REGISTER) || (dstType == DIRECT_REGISTER))
 			srcInfoReg.dstReg = atoi(dstName);
 		else
+		{
 			srcInfoReg.dstReg = 0;
+			L++;
+		}
 		srcInfoReg.rest = 0;
 		wPtr.regWordPtr = &srcInfoReg;
 		write_code_image(wPtr, DATA_REG_WORD);
@@ -171,7 +159,7 @@ int translate_data(int type, char * line)
 	{
 		while((num = get_data(&line))!=EOF)
 		{
-			word.data = two_comlement(num);
+			word.data = two_complement(num);
 			write_data_image(word);
 		}
 	}
@@ -187,4 +175,8 @@ int translate_data(int type, char * line)
 		write_data_image(word);
 	}
 	return 0;
+}
+int two_complement(int num)
+{
+	return (~num)+1;
 }

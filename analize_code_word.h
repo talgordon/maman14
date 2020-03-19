@@ -69,6 +69,7 @@ unsigned int buffer[4096];
 int write_data_image(dataWord dWord);
 int write_code_image(wordPtr ptr, int type);
 int print_mem();
+int two_complement(int num);
 
 int find_opcode(char * opcode);
 int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType);

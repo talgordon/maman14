@@ -1,21 +1,8 @@
 
-#include "analize_code_word.c"
-void build_entry();
-void build_extern();
-void build_object();
-void build_output();
-int main()
-{
-	add_label("MAIN", 100, ENTRY_LABEL);
-	add_label("fn1", 104, EXTERN_LABEL);
-	add_label("L3", 114, EXTERN_LABEL);
-	add_label("LIST", 137, ENTRY_LABEL);
-	build_entry();
-	build_extern();
-	build_object();
-	return 0;
-	
-}
+#include "analize_code_word.h"
+#include "build.h"
+#include "label.h"
+#include "analize_input_line.h"
 void build_output()
 {
 	build_object();
@@ -65,7 +52,7 @@ void build_object()
 {	
 	FILE *fp;
 	fp = fopen("ps.ob", "w");
-	fprintf("\n\t%d,\t%d\n", IC, DC);
+	fprintf(fp,"\n\t%d,\t%d\n", IC, DC);
 	print_mem();
 	fclose(fp);
 }

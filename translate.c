@@ -1,6 +1,6 @@
 #include "error.h"
-#include "binary.c"
 #include "analize_code_word.h"
+#include "analize_input_line.h"
 int write_data_image(dataWord dWord)
 {	
 	memWordPtr tmp, newWord;
@@ -41,7 +41,6 @@ int write_data_image(dataWord dWord)
 
 int write_code_image(wordPtr ptr, int type)
 {
-	IC = 0;
 	switch (type)
 	{
 		case (CODE_WORD):
@@ -76,7 +75,7 @@ int print_mem()
 {
 	memWordPtr tmp;
 	int i;
-	for (i = 100; i <= (IC + 100); i++)
+	for (i = 100; i <= IC; i++)
 	{
 		printf("\n%d\t%o", i, buffer[i-100]);
 	}
@@ -95,26 +94,4 @@ int print_mem()
 	printf("\n");
 	return SUCCESS;
 }
-/**
-int main()
-{
-	wordPtr ptr;
-	dataWord word;
-	codeWord wordC;
 
-	word.data = 9;
-	write_data_image(word);
-	word.data = two_complement(-100);
-	write_data_image(word);
-	word.data = 'a';
-	write_data_image(word);
-
-	wordC.opcode = 2;
-	wordC.src = 4;
-	wordC.dst = 2;
-	wordC.ARE = 4;
-	ptr.codeWordPtr = &wordC;
-	write_code_image(ptr, CODE_WORD);
-	print_mem();
-	return 0;	
-}**/

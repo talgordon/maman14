@@ -4,8 +4,10 @@
 int write_data_image(dataWord dWord)
 {	
 	memWordPtr tmp, newWord;
+	printf("in data_image\n");
 	if (dataHead == NULL)
 	{
+		printf("head is null\n");
 		dataHead = (memWordPtr)malloc(sizeof(memWord));
 		if (dataHead == NULL)
 		{
@@ -20,16 +22,19 @@ int write_data_image(dataWord dWord)
 	}
 	else
 	{
+		printf("head is not null\n");
 		tmp = (memWordPtr)malloc(sizeof(memWord));
 		newWord = (memWordPtr)malloc(sizeof(memWord));
 		if((tmp == NULL)||(newWord == NULL))
 		{
+			printf("allocate problem\n");
 			error_check("ALLOCATE");
 			return ERROR;
 		}
 		tmp = dataHead;
 		while(tmp->next != NULL)
 			tmp = tmp->next;
+		printf("finish while\n");
 		newWord->word = dWord.data;
 		newWord->index = DC;
 		DC++;

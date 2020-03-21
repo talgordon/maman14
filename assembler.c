@@ -8,7 +8,7 @@ int main(int argc, char * argv[])
 	char * word;
 	char * labelName;
 	FILE *ptr;
-	int i, line_num;
+	int i;
 	int wordType;
 	word = (char *)malloc(sizeof(char)*MAX_WORD);
 	labelName = (char *)malloc(sizeof(char)*MAX_WORD);
@@ -28,11 +28,12 @@ int main(int argc, char * argv[])
 		while(fgets(buf[line_num], sizeof(buf), ptr)!=NULL)/*scan all the lines in the file*/
 		{
 			printf("line was read\n");
-			wordType = get_word(&buf[line_num], &labelName);
+			wordType = get_word(&buf[line_num], &word);
 			if (wordType == LABEL)
 			{
 				printf("word is a label\n");
 				set_flag("LABEL", 1);
+				strcpy(labelName, word);
 				wordType = get_word(&buf[line_num], &word);
 			}
 			switch (wordType)
@@ -52,6 +53,7 @@ int main(int argc, char * argv[])
 				case EXTERN:
 				{
 					printf("word is extern\n");
+					printf("rest line:%s\n", buf[line_num]);
 					extern_handle();
 					break;
 				}
@@ -75,12 +77,14 @@ int main(int argc, char * argv[])
 	}	
 	if (get_flag("ERROR") == 1)/*there are errors in the code*/
 	{
+		printf("there are errors\n");
 		print_error();
 		return 0;
 	}
 	update_label(IC, LABEL_VALUE, DATA, "ALL");
 	
-
+	printf("start second loop\n");
+	print_label();
 	line_num = 0;
 	IC = 100;
 	for (i=1; i<argc; i++)
@@ -128,6 +132,7 @@ int main(int argc, char * argv[])
 		}
 		fclose(ptr);
 	}
+	printf("after second loop: IC=%d, DC=%d\n",IC, DC);
 	build_output();
 	return 0;	
 

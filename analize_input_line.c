@@ -125,45 +125,50 @@ int get_data(char **line)
 	int i, numLength, sign;
 	sign = 1;
 	numLength = 0;
-	num = (char *)malloc(10*sizeof(char));/**allocate place in the memory for num**/	
-	while(**line != '\n')/**while the input line isn't finished, scan the list**/
+	num = (char *)malloc(10*sizeof(char));/**allocate place in the memory for num**/
+	skip_spaces(line);
+	printf("in get_data, line is:%c, end of line?:%d\n", **line, (**line == '\n'));	
+	if(**line != '\n')/**while the input line isn't finished, scan the list**/
 	{	
-		skip_spaces(line);
+		
 		if(**line == '-') /**if there is a hyphen (maybe a minus sign) in the list of numbers**/
 		{
 			sign = -1;
 			(*line)++; /**move to the next character in the input**/
+			printf("is a negative number\n");
 		}
-		else /**the user didnt insert a hyphen**/
+		memset(num, '\0', strlen(num)); /**initialize the num pointer, to aviod junk cells**/
+		pch = strpbrk(*line," \t\n,"); /**find the first character in the input line which is a white space or a comma**/
+		strncpy(num, *line, (pch - *line)); /**insert the string which comes before the character in pch to num**/
+		*line = pch; /**promote cmdLine to after the string**/
+		numLength = strlen(num);/**save the length of the number which was found**/
+		/**scan all the string to check if it is a legal number**/
+		printf("num is:%s, length:%d\n", num, numLength);			
+		for(i=0;i<numLength;i++)
 		{
-			memset(num, '\0', strlen(num)); /**initialize the num pointer, to aviod junk cells**/
-			pch = strpbrk(*line," \t\n,"); /**find the first character in the input line which is a white space or a comma**/
-			strncpy(num, *line, (pch - *line)); /**insert the string which comes before the character in pch to num**/
-			*line = pch; /**promote cmdLine to after the string**/
-			numLength = strlen(num);/**save the length of the number which was found**/
-			/**scan all the string to check if it is a legal number**/			
-			for(i=0;i<numLength;i++,num++)
+			if(!isdigit(num[i])) /**if the current character is not a digit, error*/
 			{
-				if(!isdigit(*num)) /**if the current character is not a digit, error*/
-				{
-					error_check("INVALID_DATA");
-				}	
-			}
-			
+				error_check("INVALID_DATA");
+			}	
 		}
 		skip_spaces(line);
-		if (**line != ',') /**there is not a comma between two number, error**/
+		if ((**line != ',')&&(**line != '\n')) /**there is not a comma between two number, error**/
 		{
 			error_check("INVALID_DATA");
 		}
-		(*line)++; /**move to the next character**/
+		if (**line != '\n')
+			(*line)++; /**move to the next character**/
 		skip_spaces(line);
 		if (**line == ',') /**multiple commas, error**/
 		{
 			error_check("INVALID_DATA");
 		}
+		printf("finish one ran,atoi(num):%d, sign:%d, going to return :%d\n", atoi(num), sign, atoi(num)*sign);
+		return (atoi(num)*sign);
 	}
-	return atoi(num)*sign;
+	else
+		printf("is in else\n");
+		return EOF;
 }
 
 
@@ -234,46 +239,127 @@ types get_word(char * line[40], char ** word)
 }
 
 /*A function that analize a aline from the input, reads the operands in the */
-void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char ** dstName)
+void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char ** dstName, int loop)
 {
 	labelPtr label;
 	char * pch;
 	char * str;
 	str = (char *)malloc(sizeof(char)*MAX_WORD);
 	label=(labelPtr)malloc(sizeof(label));
+	skip_spaces(&line);	
+	if (*line == '\n')
+	{
+		printf("no operands\n");
+		*srcType = 0;
+		*srcName = NULL;
+		*dstType = 0;
+		*dstName = NULL;
+		return;
+	}
+	pch=(strpbrk(line," \t\n,"));
+	strncpy(str,line,(pch-line));
+	line=pch;
+	printf("str:%s\n", str);
+	comma_logic(&line);
 	skip_spaces(&line);
-	printf("in get operands, line:%s\n", line);
-	switch(*line)
+	printf("*line:%c\n", *line);
+	if (*line == '\n')
+	{
+		printf("one operand\n");
+		*srcType = 0;
+		*srcName = NULL;
+	}
+	else
+	{
+		printf("in get operands, line:%s\n", line);
+		switch(*str)
+		{
+			case '#':
+			{
+				printf("case #\n");
+				*srcType=1;
+				strcpy(*srcName, (str+1));
+				printf("srcName:%s\n", *srcName);
+				break;
+			}
+
+			case '*':
+			{	
+				printf("case *\n");
+			    	*srcType=4;
+				strcpy(*srcName, (str+2));
+				printf("srcName:%s\n", *srcName);
+				break;
+			}
+	 		
+			default :
+			{
+				printf("case default\n");
+				*srcType=4;
+				printf("*str:%c\n", *str);
+				if(*str == 'r')
+				{
+					str++;
+					printf("atoi(str):%d\n", atoi(str));
+					if ((atoi(str) < 8) && (atoi(str) > 0))
+					{
+						if(*(str+1) == '\0')
+						{
+							printf("case r\n");
+							*srcType = 8;
+							strcpy(*srcName, str);
+							printf("srcName:%s\n", *srcName);
+						}
+					}
+				}
+				else
+				{
+					if (loop == 2)
+						get_label(str, 0, 0, &label);
+					if((label!=NULL)||(loop == 1))
+					{
+						printf("case label\n");
+						*srcType = 2;
+						strcpy(*srcName, str);
+						printf("srcName:%s\n", *srcName);
+					}
+					else
+					{
+						error_check("LINE_INVALID");
+					}
+				}
+				break;
+			}
+		}
+		memset(str, '\0', strlen(str));
+		pch=(strpbrk(line," \t\n,"));
+		strncpy(str,line,(pch-line));
+		line=pch;
+	}
+	
+	printf("*str before check dst:%c\n", *str);
+	switch(*str)
 	{
 		case '#':
 		{
 			printf("case #\n");
-			*srcType=1;
-			pch=(strpbrk(line," \t\n,"));
-			strncpy(*srcName,line,(pch-line));
-			line=pch;
-			printf("srcName:%s\n", *srcName);
+			*dstType=1;
+			strcpy(*dstName, (str+1));		
+			break;
 		}
-
 		case '*':
-		{	
+		{
 			printf("case *\n");
-		    	*srcType=4;
-			pch=(strpbrk(line," \t\n,"));
-			strncpy(str,line,(pch-line));
-			line=pch;
-			strcpy(*srcName, (str+1));
-			printf("srcName:%s\n", *srcName);
+		    	*dstType=4;
+			strcpy(*dstName, (str+2));  
+			break;  
 		}
  		
 		default :
 		{
+
 			printf("case default\n");
-			*srcType=4;
-			memset(str, '\0', strlen(str));
-			pch=(strpbrk(line," \t\n,"));
-			strncpy(str,line,(pch-line));
-			line=pch;
+			*dstType=4;
 			printf("*str:%c\n", *str);
 			if(*str == 'r')
 			{
@@ -281,77 +367,24 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 				printf("atoi(str):%d\n", atoi(str));
 				if ((atoi(str) < 8) && (atoi(str) > 0))
 				{
-					if(*(++str) == '\0')
+					if(*(str+1) == '\0')
 					{
 						printf("case r\n");
-						*srcType = 8;
-						strcpy(*srcName, (str+1));
-						printf("srcName:%s\n", *srcName);
-					}
-				}
-			}
-			else
-			{
-				get_label(str, 0, 0, &label);
-				if(label!=NULL)
-				{
-					printf("case label\n");
-					*srcType = 2;
-					strcpy(*srcName, str);
-					printf("srcName:%s\n", *srcName);
-				}
-				else
-				{
-					error_check("LINE_INVALID");
-				}
-			}
-		}
-	}
-
-	comma_logic(&line);
-	skip_spaces(&line);
-
-	switch(*line)
-	{
-		case '#':
-		{
-			*dstType=1;
-			pch=(strpbrk(line," \t\n,"));
-			strncpy(*dstName,line,(pch-line));
-			line=pch;
-		}
-		case '*':
-		{
-		    *dstType=4;
-			pch=(strpbrk(line," \t\n,"));
-			strncpy(str,line,(pch-line));
-			line=pch;
-			strcpy(*dstName, (str+1));    
-		}
- 		
-		default :
-		{
-			*dstType=4;
-			pch=(strpbrk(line," \t\n,"));
-			strncpy(str,line,(pch-line));
-			line=pch;
-			if(*str == 'r')
-			{
-				if ((atoi(++str) < 8) && (atoi(str) > 0))
-				{
-					if(*(++str) == '\0')
-					{
 						*dstType = 8;
-						strcpy(*dstName, (str+1));
-						printf("!");
+						strcpy(*dstName, str);
+						printf("dstName:%s\n", *dstName);
 					}
 				}
 			}
 			else
 			{
-				get_label(str, 0, 0, &label);
-				if(label!=NULL)
+				printf("before get_label\n");
+				if (loop == 2)				
+					get_label(str, 0, 0, &label);	
+				printf("after get label\n");
+				if((label!=NULL)||(loop == 1))
 				{
+					printf("is label\n");
 					*dstType = 2;
 					strcpy(*dstName, str);
 					printf("?\n");
@@ -361,6 +394,7 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 					error_check("LINE_INVALID");
 				}
 			}
+			break;
 			
 		}
 	}

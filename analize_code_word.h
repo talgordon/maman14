@@ -5,7 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
+#define MAX_WORDS 4096
+#define A 4
+#define R 2
+#define E 1
+#define IMMEDIATE 1
+#define DIRECT 2
+#define INDIRECT_REGISTER 4
+#define DIRECT_REGISTER 8
 
 typedef struct codeWord{
 	 unsigned int ARE : 3;
@@ -63,7 +70,6 @@ typedef struct memWord{
 enum types{CODE_WORD, DATA_WORD, DATA_REG_WORD};
 
 memWordPtr dataHead;
-
 unsigned int buffer[4096];
 
 int write_data_image(dataWord dWord);

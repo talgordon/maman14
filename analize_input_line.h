@@ -25,5 +25,5 @@ void init();
 int get_data(char **line);
 int is_label(char * line);
 types get_word(char * line[], char ** word);
-void get_operand(char * line, int * srcType, int *dstType, char ** srcName, char ** dstName);
+void get_operand(char * line, int * srcType, int *dstType, char ** srcName, char ** dstName, int loop);
 

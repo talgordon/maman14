@@ -2,20 +2,13 @@
 #include "analize_input_line.h"
 #include "error.h"
 #include "label.h"
-#define MAX_WORDS 4096
-#define A 4
-#define R 2
-#define E 1
-#define IMMEDIATE 1
-#define DIRECT 2
-#define INDIRECT_REGISTER 4
-#define DIRECT_REGISTER 8
+
 
 const char * opcodeTable[16] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 int find_opcode(char * opcode)
 {
 	int i;
-	
+	printf("in fine_opcode, opcode:%s\n", opcode);
 	for(i = 0; i<16; i++)
 	{
 		if (strcmp(opcode, opcodeTable[i]) == 0)
@@ -68,7 +61,7 @@ int finish_translate(char *line, wordPtr wPtr)
 	int dstType;
 	srcType = 0;
 	dstType = 0;
-	get_operand(line, &srcType, &dstType, &srcName, &dstName);
+	get_operand(line, &srcType, &dstType, &srcName, &dstName, 2);
 	/**get the info words, one, two or non at all**/	
 	if(dstType == 0)
 	{
@@ -154,22 +147,30 @@ int finish_translate(char *line, wordPtr wPtr)
 int translate_data(int type, char * line)
 {
 	dataWord word;
-	int num, c;
+	int c;
+	int num;
 	if (type == DATA)
 	{
-		while((num = get_data(&line))!=EOF)
+		printf("case DATA\n");
+		while((num = get_data(&line))!= EOF)
 		{
+			
 			word.data = two_complement(num);
+			printf("call write_data_image with %d\n", num);
 			write_data_image(word);
+			printf("finish data_image\n");
 		}
 	}
 
 	if(type == STRING)
 	{
-		while((c = *line) != EOF)
+		printf("case STRING\n");
+		while((c = *line) != '\n')
 		{
 			word.data = c;
+			printf("call write_data_image with %c\n", c);
 			write_data_image(word);
+			line++;
 		}
 		word.data = 0;
 		write_data_image(word);

@@ -127,12 +127,14 @@ int update_label(int update, int updateType, int labelType, char *name)
 			if(updateType == LABEL_VALUE)
 			{
 				tmp->labelValue+= update;
-				return SUCCESS;
+				if (strcmp(tmp->labelName, name) == 0)				
+					return SUCCESS;
 			}
 			if(updateType == LABEL_TYPE)
 			{
 				tmp->labelType = update;
-				return SUCCESS;
+				if (strcmp(tmp->labelName, name) == 0)				
+					return SUCCESS;
 			}		
 		}
 		tmp = tmp->next;

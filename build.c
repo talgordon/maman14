@@ -21,8 +21,8 @@ void build_entry()
 	fp = fopen("ps.ent", "w");/*Open the file ps.ent*/
 	while(label!=NULL)/*Run as long as label equal to NULL and print the label name and his value.*/
 	{
-		if(label->labelType == ENTRY_LABEL)/*Check if is entry-print*/
-			fprintf(fp,"%s\t%d\n", label->labelName, label->labelValue);
+		if(label->labelLink == ENTRY_LABEL)/*Check if is entry-print*/
+			fprintf(fp,"%s\t%d\t%d\n", label->labelName, label->labelValue, label->labelLink);
 		label = label->next;/*If not a entry-one step ahead*/
 	}
 	fclose(fp);/*Close the file*/
@@ -42,12 +42,9 @@ void build_extern()
 	{
 		if(buffer[i]&mask)
 		{
-			while(label!=NULL)/*Run as long as label equal to NULL and print the label name and his place.*/
-			{
-				if((label->labelType == EXTERN_LABEL)&&(label->labelValue == buffer[i]>>2))/*If is extern-print*/
-					fprintf(fp,"%s\t%d\n", label->labelName, i);
+			fprintf(fp,"%s\t%d\n", label->labelName, i);
 				label = label->next;/*If not a extern-one step ahead*/
-			}
+		
 		}
 	}
 	fclose(fp);/*Close the file*/
@@ -59,6 +56,6 @@ void build_object()
 	FILE *fp;
 	fp = fopen("ps.ob", "w");/*Open the file ps.ob*/
 	fprintf(fp,"\n\t%d,\t%d\n", IC, DC);/*Print the IC and DC*/
-	print_mem();/*Call to the function print_mem that print ????*/
+	print_mem(fp);/*Call to the function print_mem that print ????*/
 	fclose(fp);/*Close the file*/
 }

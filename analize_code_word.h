@@ -25,6 +25,7 @@ typedef struct codeWord{
 typedef struct infoWordData{
 	 unsigned int ARE : 3;
 	 unsigned int data : 12;
+	 char * extern_label_name; 
 }infoWordData;	
 
 /**second/third code wird, a data word with direct register/indirect register address method**/
@@ -71,6 +72,7 @@ enum types{CODE_WORD, DATA_WORD, DATA_REG_WORD};
 
 memWordPtr dataHead;
 unsigned int buffer[4096];
+
 
 int write_data_image(dataWord dWord);
 int write_code_image(wordPtr ptr, int type);

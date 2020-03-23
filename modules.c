@@ -10,7 +10,7 @@ void data_handle(char * labelName, int type)
 	printf("in data_handle\n");
 	if (get_flag("LABEL") == 1)
 	{
-		add_label(labelName, DC, DATA_LABEL);
+		add_label(labelName, DC, DATA_LABEL, NOT_LINKED_LABEL);
 		set_flag("LABEL", 0);
 		printf("in data_handle, label %s was added\n", labelName);
 	}
@@ -23,8 +23,9 @@ void data_handle(char * labelName, int type)
 void entry_handle()/*second loop*/
 {
 	char *word;
+	printf("in entry handle, buf[line_num] is:%s\n", buf[line_num]);
 	while (get_word(&buf[line_num], &word)!= END)
-		add_label(word, LABEL_TYPE, ENTRY_LABEL);
+		update_label(ENTRY_LABEL, LABEL_LINK, 0, 0, word);
 }
 
 void extern_handle()
@@ -32,7 +33,11 @@ void extern_handle()
 	char *word;
 	printf("in extern handle, buf[line_num] is:%s\n", buf[line_num]);
 	while (get_word(&buf[line_num], &word)!= END)
-		add_label(word, NO_ADDRESS, EXTERN_LABEL);
+	{
+		printf("label to add:%s\n", word);
+		add_label(word, NO_ADDRESS, UNDEFINED_LABEL, EXTERN_LABEL);
+		printf("label %s was added\n", word);
+	}
 }
 
 void code_handle_first(char * labelName, char * word)
@@ -46,12 +51,12 @@ void code_handle_first(char * labelName, char * word)
 	printf("in code handle, buf[line_num] is:%s\n", buf[line_num]);
 	if (get_flag("LABEL") == 1)
 	{
-		add_label(labelName, IC, CODE_LABEL);
+		add_label(labelName, IC, CODE_LABEL, NOT_LINKED_LABEL);
 		set_flag("LABEL", 0);
 		printf("label %s was added\n", labelName);
 	}
 	if ((opcode = find_opcode(word)) < 0)
-		error_check("OPCODE");
+		add_error(UNEXISTED_OPCODE);
 	printf("line for get_operands:%s\n", buf[line_num]);
 	get_operand(buf[line_num], &srcType, &dstType, &srcName, &dstName, 1);
 	L = 1;
@@ -69,6 +74,9 @@ void code_handle_first(char * labelName, char * word)
 void code_handle_second()
 {
 	wordPtr wPtr;
+	printf("in second code handle, buf[line_num]:%s\n", buf[line_num]);
+	IC++;
 	finish_translate(buf[line_num], wPtr);
-	IC = IC + L;
+	printf("finish finish translate\n");
+	printf("IC:%d\n", IC);	
 }

@@ -59,7 +59,7 @@ void get_line(int argc, char * argv[])
 	{	
 		if((ptr = fopen(argv[i], "r")) == NULL)/*Check if the file is empty-print error and exit*/
 		{
-			error_check("CANNOT_OPEN_FILE");
+			add_error(CANNOT_OPEN_FILE);
 			exit(1);
 		}
 		index = 0;
@@ -93,7 +93,7 @@ void legal_EOL(char ** line)
 			(*line)++;
 		else /**if the character isn't a white space, error**/
 		{
-			error_check("LINE_INVALID");
+			add_error(TOO_MANY_OPERANDS);
 		}
 	}
 }
@@ -104,7 +104,7 @@ void comma_logic(char **line)
 	skip_spaces(line);
 	if (**line != ',') /*check_comma*/
 	{
-		error_check("LINE_INVALID");
+		add_error(MISSING_COMMA);
 	}
 	else /*found a comma*/
 	{
@@ -112,7 +112,7 @@ void comma_logic(char **line)
 		skip_spaces(line);
 		if (**line == ',') /**check for multiple commas**/
 		{
-			error_check("LINE_INVALID");
+			add_error(MULTIPLE_COMMA);
 		}
 	}
 }
@@ -148,20 +148,20 @@ int get_data(char **line)
 		{
 			if(!isdigit(num[i])) /**if the current character is not a digit, error*/
 			{
-				error_check("INVALID_DATA");
+				add_error(INVALID_DATA);
 			}	
 		}
 		skip_spaces(line);
 		if ((**line != ',')&&(**line != '\n')) /**there is not a comma between two number, error**/
 		{
-			error_check("INVALID_DATA");
+			add_error(MISSING_COMMA);
 		}
 		if (**line != '\n')
 			(*line)++; /**move to the next character**/
 		skip_spaces(line);
 		if (**line == ',') /**multiple commas, error**/
 		{
-			error_check("INVALID_DATA");
+			add_error(MULTIPLE_COMMA);
 		}
 		printf("finish one ran,atoi(num):%d, sign:%d, going to return :%d\n", atoi(num), sign, atoi(num)*sign);
 		return (atoi(num)*sign);
@@ -245,6 +245,7 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 	char * pch;
 	char * str;
 	str = (char *)malloc(sizeof(char)*MAX_WORD);
+	memset(str, '\0', strlen(str));
 	label=(labelPtr)malloc(sizeof(label));
 	skip_spaces(&line);	
 	if (*line == '\n')
@@ -256,10 +257,11 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 		*dstName = NULL;
 		return;
 	}
+	printf("in get operands, line:%s\n", line);
 	pch=(strpbrk(line," \t\n,"));
 	strncpy(str,line,(pch-line));
 	line=pch;
-	printf("str:%s\n", str);
+	printf("in get_operands, str:%s\n", str);
 	comma_logic(&line);
 	skip_spaces(&line);
 	printf("*line:%c\n", *line);
@@ -307,7 +309,9 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 						{
 							printf("case r\n");
 							*srcType = 8;
+							printf("before copy src, srcName:%s, str:%s\n", *srcName, str);
 							strcpy(*srcName, str);
+							printf("after copy src\n");
 							printf("srcName:%s\n", *srcName);
 						}
 					}
@@ -320,12 +324,14 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 					{
 						printf("case label\n");
 						*srcType = 2;
+						printf("before copy\n");
 						strcpy(*srcName, str);
+						printf("after copy\n");
 						printf("srcName:%s\n", *srcName);
 					}
 					else
 					{
-						error_check("LINE_INVALID");
+						add_error(INVALID_SRC_TYPE);
 					}
 				}
 				break;
@@ -382,6 +388,7 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 				if (loop == 2)				
 					get_label(str, 0, 0, &label);	
 				printf("after get label\n");
+				printf("label == NULL?%d\n", label == NULL);
 				if((label!=NULL)||(loop == 1))
 				{
 					printf("is label\n");
@@ -391,7 +398,7 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 				}
 				else
 				{
-					error_check("LINE_INVALID");
+					add_error(INVALID_DST_TYPE);
 				}
 			}
 			break;

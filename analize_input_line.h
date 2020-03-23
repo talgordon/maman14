@@ -1,11 +1,10 @@
 #include <ctype.h>
-#define MAX_WORD 40
+#define MAX_WORD 80
 	
 unsigned int DC;
 unsigned int IC;
 unsigned int L;
 char * buf[1000];
-extern int line_num;
 typedef enum type{LABEL , DATA , STRING , EXTERN , ENTRY, CODE, END} types;
 
 typedef struct addressMethod *addrMethodPtr;

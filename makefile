@@ -6,7 +6,6 @@ error.o: error.c
 label.o: label.c 
 	gcc -c -ansi -I -Wall -pedantic label.c -o label.o
 
-
 analize_input_line.o: analize_input_line.c
 	gcc -c -ansi -I -Wall -pedantic analize_input_line.c -o analize_input_line.o
 

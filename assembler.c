@@ -18,7 +18,7 @@ int main(int argc, char * argv[])
 	{	
 		if((ptr = fopen(argv[i], "r")) == NULL)
 		{
-			error_check("CANNOT_OPEN_FILE");
+			add_error(CANNOT_OPEN_FILE);
 			exit(1);
 		}
 		printf("file opened successfuly\n");
@@ -79,11 +79,11 @@ int main(int argc, char * argv[])
 	{
 		printf("there are errors\n");
 		print_error();
-		return 0;
+		
 	}
-	update_label(IC, LABEL_VALUE, DATA, "ALL");
+	update_label(IC, LABEL_VALUE, DATA, LABEL_TYPE, "ALL");
 	
-	printf("start second loop\n");
+	printf("start second loop, IC:%d, DC:%d\n", IC, DC);
 	print_label();
 	line_num = 0;
 	IC = 100;
@@ -91,7 +91,7 @@ int main(int argc, char * argv[])
 	{	
 		if((ptr = fopen(argv[i], "r")) == NULL)
 		{
-			error_check("CANNOT_OPEN_FILE");
+			add_error(CANNOT_OPEN_FILE);
 			exit(1);
 		}
 		line_num = 0;/**new file**/
@@ -114,6 +114,7 @@ int main(int argc, char * argv[])
 				}
 				case ENTRY:
 				{
+					printf("word is entry\n");
 					entry_handle();
 					break;
 				}
@@ -133,6 +134,12 @@ int main(int argc, char * argv[])
 		fclose(ptr);
 	}
 	printf("after second loop: IC=%d, DC=%d\n",IC, DC);
+	if (get_flag("ERROR") == 1)/*there are errors in the code*/
+	{
+		printf("there are errors\n");
+		print_error();
+	
+	}
 	build_output();
 	return 0;	
 

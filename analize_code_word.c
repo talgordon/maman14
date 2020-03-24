@@ -28,18 +28,27 @@ int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
 	
 	numOfOp_table = 0;
 	numOfOp_line = 0;
-	if (addressTable->src != 0)
+	if (addressTable[opcode].src != 0)
+	{
 		numOfOp_table++;
-	if (addressTable->dst != 0)
+	}
+	if (addressTable[opcode].dst != 0)
 		numOfOp_table++;
 	if (srcType != 0)
 		numOfOp_line++;
 	if (dstType != 0)
 		numOfOp_line++;
+	printf("numOfOp_table:%d, numOfOp_line:%d\n",numOfOp_table , numOfOp_line);
 	if(numOfOp_table > numOfOp_line)
+	{
+		printf("too few\n");
 		add_error(TOO_FEW_OPERANDS);
+	}
 	if(numOfOp_table < numOfOp_line)
+	{
+		printf("too many\n");
 		add_error(TOO_MANY_OPERANDS);
+	}
 	if (srcType&addressTable[firstWord.opcode].src == 0)	
 	{
 		add_error(INVALID_SRC_TYPE);
@@ -100,8 +109,7 @@ int finish_translate(char *line, wordPtr wPtr)
 			{			
 				srcInfo.ARE = E;
 				srcInfo.data = 0;
-				srcInfo.extern_label_name = (char *)malloc(sizeof(char)*MAX_LABEL);
-				strcpy(srcInfo.extern_label_name, label->labelName);
+				add_extern(label->labelName, IC);
 			}
 			else
 			{
@@ -138,6 +146,7 @@ int finish_translate(char *line, wordPtr wPtr)
 			printf("finish write_code_image\n");
 		}
 	}
+	printf("dstType:%d\n", dstType);
 	if((dstType == IMMEDIATE) || (dstType == DIRECT))
 	{
 		infoWordData dstInfo;
@@ -159,6 +168,7 @@ int finish_translate(char *line, wordPtr wPtr)
 			{
 				dstInfo.ARE = E;
 				dstInfo.data = 0;
+				add_extern(label->labelName, IC);
 				printf("ARE:%d\n", dstInfo.ARE);
 			}
 			else
@@ -201,6 +211,12 @@ int translate_data(int type, char * line)
 	if (type == DATA)
 	{
 		printf("case DATA\n");
+		skip_spaces(&line);
+		if (*line == '\n')
+		{
+			add_error(MISSING_DATA);
+			return 0;
+		}
 		while((num = get_data(&line))!= EOF)
 		{
 			
@@ -214,6 +230,12 @@ int translate_data(int type, char * line)
 	if(type == STRING)
 	{
 		printf("case STRING\n");
+		skip_spaces(&line);
+		if (*line == '\n')
+		{
+			add_error(MISSING_DATA);
+			return 0;
+		}
 		line++;
 		while(((c = *line) != '\n')&&(c != '"'))
 		{

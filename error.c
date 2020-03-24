@@ -93,6 +93,9 @@ void print_error()
 			case RESERVED_LABEL_NAME:
 				fprintf(stderr, "the label's name is illegal - is a reserved word");
 				break;
+			case MISSING_DATA:
+				fprintf(stderr, "missing any data after '.data' or '.string'");
+				break;
 		}	
 		fprintf(stderr, ", in line:%d\n", tmp->lineNum+1);
 		tmp = tmp->next;	

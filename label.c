@@ -66,6 +66,11 @@ void add_label(char * name, int value, int type, int link)
 		{
 			add_error(ALLOCATE);
 		}
+		if (!isalpha(*name))
+		{
+			add_error(INVALID_LABEL_NAME);
+			return;
+		}
 		if (isreserved(name) == 0)
 		{
 			add_error(RESERVED_LABEL_NAME);
@@ -108,6 +113,11 @@ void add_label(char * name, int value, int type, int link)
 		if (newLabel->labelName == NULL)/*If is not have the name-return error*/
 		{
 			add_error(ALLOCATE);
+		}
+		if (!isalpha(*name))
+		{
+			add_error(INVALID_LABEL_NAME);
+			return;
 		}
 		if (isreserved(name) == 0)
 		{
@@ -194,12 +204,66 @@ int update_label(int update, int updateType, int labelID, int IDType, char *name
 		}
 		tmp = tmp->next;
 	}
-	add_error(UNEXISTED_LABEL);
+	if (strcmp(name, "ALL") != 0)
+		add_error(UNEXISTED_LABEL);
 	return ERROR;
 }
 
 
+void add_extern(char * name, int value)
+{
+	externPtr tmp, newExtern;	
+	printf("name is: %s\n", name);
+	if (extern_head == NULL)/*If the list is empty*/
+	{	
+		extern_head = (externPtr)malloc(sizeof(externLabel));
+		extern_head->externName = (char *)malloc(sizeof(name)*sizeof(char));
+		if((extern_head->externName == NULL)||(extern_head == NULL))/*If the name is empty-return error*/
+		{
+			add_error(ALLOCATE);
+		}
+		strcpy(extern_head->externName, name);/*Add the name to the labelNmae*/
+		extern_head->externValue = value;/*Add the value to the labelValue*/
+		extern_head->next = NULL;/*Add the pointer to the NULL*/
+	}
+	else/*If in the list have a parts*/
+	{
+		tmp = (externPtr)malloc(sizeof(externLabel));
+		newExtern = (externPtr)malloc(sizeof(externLabel));
+		if((tmp == NULL)||(newExtern == NULL))/*If the new label is empty-return error*/
+		{
+			add_error(ALLOCATE);
+		}
+		tmp = extern_head;
+		while(tmp->next != NULL)/*Loop that run by the end of the list*/
+		{
+			tmp = tmp->next;/*Progress to the next node*/
+		}
+		newExtern->externName = (char *)malloc(sizeof(name)*sizeof(char));
+		if (newExtern->externName == NULL)/*If is not have the name-return error*/
+		{
+			add_error(ALLOCATE);
+		}
+		strcpy(newExtern->externName, name);/*Add the name to the labelNmae*/
+		newExtern->externValue = value;/*Add the value to the labelValue*/
+		newExtern->next = NULL;/*Add the pointer to the NULL*/
+		tmp->next = newExtern;/*Progress to the next node*/
+	}
+}
 
-
-
+void print_extern(FILE * fp)
+{
+	externPtr tmp;
+	tmp = (externPtr)malloc(sizeof(externLabel));
+	if(tmp == NULL)/*If is not have a label return error*/
+	{
+		add_error(ALLOCATE);
+	}
+	tmp = extern_head;
+	while(tmp != NULL)/*Loop that print the label as long as have a label*/
+	{
+		fprintf(fp,"\n%s\t%04d", tmp->externName, tmp->externValue);/*Print the label name and his value*/
+		tmp = tmp->next;/*Progress to the next node*/	
+	}
+}
 

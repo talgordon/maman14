@@ -23,6 +23,7 @@ void data_handle(char * labelName, int type)
 void entry_handle()/*second loop*/
 {
 	char *word;
+	word = (char *)malloc(sizeof(char)*MAX_WORD);
 	printf("in entry handle, buf[line_num] is:%s\n", buf[line_num]);
 	while (get_word(&buf[line_num], &word)!= END)
 		update_label(ENTRY_LABEL, LABEL_LINK, 0, 0, word);

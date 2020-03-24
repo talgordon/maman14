@@ -25,50 +25,54 @@ int main(int argc, char * argv[])
 		line_num = 0;/**new file**/
 		memset(buf[line_num], '\0', strlen(buf[line_num]));
 		
-		while(fgets(buf[line_num], sizeof(buf), ptr)!=NULL)/*scan all the lines in the file*/
+		while(fgets(buf[line_num], MAX_LINE, ptr)!=NULL)/*scan all the lines in the file*/
 		{
-			printf("line was read\n");
-			wordType = get_word(&buf[line_num], &word);
-			if (wordType == LABEL)
-			{
-				printf("word is a label\n");
-				set_flag("LABEL", 1);
-				strcpy(labelName, word);
+			set_flag("LABEL",0);
+			printf("line was read, line is:%s\n", buf[line_num]);
+			if (!((buf[line_num][0] == '\n')||((buf[line_num][0] == '/')&&(buf[line_num][1] == '*')&&(buf[line_num][strlen(buf[line_num])-3] == '*')&& (buf[line_num][strlen(buf[line_num])-2] == '/'))))
+			{	
 				wordType = get_word(&buf[line_num], &word);
-			}
-			switch (wordType)
-			{
-				case DATA:
-				case STRING:
+				if (wordType == LABEL)
 				{
-					printf("word is data or string\n");
-					data_handle(labelName, wordType);
-					break;
+					printf("word is a label\n");
+					set_flag("LABEL", 1);
+					strcpy(labelName, word);
+					wordType = get_word(&buf[line_num], &word);
 				}
-				case ENTRY:
+				switch (wordType)
 				{
-					printf("word is entry\n");
-					break;
+					case DATA:
+					case STRING:
+					{
+						printf("word is data or string\n");
+						data_handle(labelName, wordType);
+						break;
+					}
+					case ENTRY:
+					{
+						printf("word is entry\n");
+						break;
+					}
+					case EXTERN:
+					{
+						printf("word is extern\n");
+						printf("rest line:%s\n", buf[line_num]);
+						extern_handle();
+						break;
+					}
+					case CODE:
+					{
+						printf("word is code\n");
+						printf("rest line:%s\n", buf[line_num]);
+						code_handle_first(labelName, word);
+						break;
+					}
+					case END:
+					{
+						break;	
+					}
+				
 				}
-				case EXTERN:
-				{
-					printf("word is extern\n");
-					printf("rest line:%s\n", buf[line_num]);
-					extern_handle();
-					break;
-				}
-				case CODE:
-				{
-					printf("word is code\n");
-					printf("rest line:%s\n", buf[line_num]);
-					code_handle_first(labelName, word);
-					break;
-				}
-				case END:
-				{
-					break;	
-				}
-			
 			}
 			printf("moving to the next line, line_num:%d\n", line_num);
 			line_num++;
@@ -99,36 +103,40 @@ int main(int argc, char * argv[])
 		
 		while(fgets(buf[line_num], sizeof(buf), ptr)!=NULL)/*scan all the lines in the file*/
 		{
-			wordType = get_word(&buf[line_num], &labelName);
-			if (wordType == LABEL)
-			{
-				wordType = get_word(&buf[line_num], &word);
+			if (!((buf[line_num][0] == '\n')||((buf[line_num][0] == '/')&&(buf[line_num][1] == '*')&&(buf[line_num][strlen(buf[line_num])-3] == '*')&& (buf[line_num][strlen(buf[line_num])-2] == '/'))))
+			{			
+				wordType = get_word(&buf[line_num], &labelName);
+				if (wordType == LABEL)
+				{
+					wordType = get_word(&buf[line_num], &word);
+				}
+				switch (wordType)
+				{
+					case DATA:
+					case STRING:
+					case EXTERN:
+					{
+						break;
+					}
+					case ENTRY:
+					{
+						printf("word is entry\n");
+						entry_handle();
+						break;
+					}
+					case CODE:
+					{
+						code_handle_second();
+						break;
+					}
+					case END:
+					{
+						break;	
+					}
+				
+				}
 			}
-			switch (wordType)
-			{
-				case DATA:
-				case STRING:
-				case EXTERN:
-				{
-					break;
-				}
-				case ENTRY:
-				{
-					printf("word is entry\n");
-					entry_handle();
-					break;
-				}
-				case CODE:
-				{
-					code_handle_second();
-					break;
-				}
-				case END:
-				{
-					break;	
-				}
-			
-			}
+			printf("moving to the next line, line_num:%d\n", line_num);
 			line_num++;
 		}
 		fclose(ptr);

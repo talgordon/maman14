@@ -31,6 +31,7 @@ void entry_handle()/*second loop*/
 void extern_handle()
 {
 	char *word;
+	word = (char *)malloc(sizeof(char)*MAX_WORD);
 	printf("in extern handle, buf[line_num] is:%s\n", buf[line_num]);
 	while (get_word(&buf[line_num], &word)!= END)
 	{

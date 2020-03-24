@@ -1,6 +1,6 @@
 #include <ctype.h>
 #define MAX_WORD 80
-	
+#define MAX_LINE 127	
 unsigned int DC;
 unsigned int IC;
 unsigned int L;

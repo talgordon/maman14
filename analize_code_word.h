@@ -1,11 +1,9 @@
-#define MAX_LINE 0;
 #define MAX_FILE 0;
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#define MAX_WORDS 4096
 #define A 4
 #define R 2
 #define E 1
@@ -25,7 +23,6 @@ typedef struct codeWord{
 typedef struct infoWordData{
 	 unsigned int ARE : 3;
 	 unsigned int data : 12;
-	 char * extern_label_name; 
 }infoWordData;	
 
 /**second/third code wird, a data word with direct register/indirect register address method**/

@@ -37,10 +37,10 @@ void init()
 	addressTable[14].dst = 0;
 	addressTable[15].src = 0;
 	addressTable[15].dst = 0;
-
+	printf("before init buf\n");
 	for(i = 0; i<1000; i++)	
 	{
-		buf[i] = (char *)malloc(sizeof(char)*40);
+		buf[i] = (char *)malloc(sizeof(char)*MAX_LINE);
 		strcpy(buf[i], "empty line");	
 	}
 
@@ -48,30 +48,6 @@ void init()
 	IC = 100;
 	DC = 0;
 	L = 0;
-}
-
-/*A function that reads a line from the input file.*/
-void get_line(int argc, char * argv[])
-{
-	FILE *ptr;
-	int i, index;
-	for (i=1; i<argc; i++)/*Loop that run until the file was read*/
-	{	
-		if((ptr = fopen(argv[i], "r")) == NULL)/*Check if the file is empty-print error and exit*/
-		{
-			add_error(CANNOT_OPEN_FILE);
-			exit(1);
-		}
-		index = 0;
-		memset(buf[index], '\0', strlen(buf[index]));
-		while(fgets(buf[index], sizeof(buf), ptr)!=NULL)/*Income the line in the file into an array called buf and magnification the index*/
-		{
-			fputs(buf[index],stdout);
-			fputs("",stdout);
-			index++;
-		}
-		fclose(ptr);/*Close the file*/
-	}
 }
 
 /**skip white spaces.
@@ -192,7 +168,6 @@ types get_word(char * line[40], char ** word)
 {
 	
 	char * pch;
-	char * str=NULL;
 	memset(*word, '\0', strlen(*word));
 	printf("in get word, line:%s\n", *line);
 	skip_spaces(line);
@@ -202,9 +177,11 @@ types get_word(char * line[40], char ** word)
 	}
 	if((is_label(*line)) == 0)/*Check if is label-return LABEL*/
 	{
+		printf("after label, line:%s\n", *line);
 		pch=(strpbrk(*line," \t\n,"));
 		strncpy(*word,*line,(pch-*line));
 		*line=pch;
+		printf("return label:%s\n", *word);
 		return LABEL;
 	}
 	pch=(strpbrk(*line," \t\n,"));
@@ -227,6 +204,7 @@ types get_word(char * line[40], char ** word)
 
 		else if(strcmp(*word,".extern")==0)/*Check if is extrn-return EXTERN*/
 		{
+			printf("returning extern\n");
 			return EXTERN;
 		}
 
@@ -262,7 +240,6 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 	strncpy(str,line,(pch-line));
 	line=pch;
 	printf("in get_operands, str:%s\n", str);
-	comma_logic(&line);
 	skip_spaces(&line);
 	printf("*line:%c\n", *line);
 	if (*line == '\n')
@@ -274,6 +251,8 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 	else
 	{
 		printf("in get operands, line:%s\n", line);
+		comma_logic(&line);
+		skip_spaces(&line);
 		switch(*str)
 		{
 			case '#':

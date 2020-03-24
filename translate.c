@@ -88,7 +88,7 @@ int print_mem(FILE * fp)
 	int i;
 	for (i = 100; i < IC; i++)
 	{
-		fprintf(fp,"\n%d\t%05o", i, buffer[i]);
+		fprintf(fp,"\n%04d\t%05o", i, buffer[i]);
 	}
 	tmp = (memWordPtr)malloc(sizeof(memWord));
 	if(tmp == NULL)
@@ -99,7 +99,7 @@ int print_mem(FILE * fp)
 	tmp = dataHead;
 	while(tmp != NULL)
 	{
-		fprintf(fp,"\n%d\t%05o", tmp->index+IC, tmp->word);
+		fprintf(fp,"\n%04d\t%05o", tmp->index+IC, tmp->word);
 		tmp = tmp->next;
 	}
 	printf("\n");

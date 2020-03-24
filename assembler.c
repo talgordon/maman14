@@ -63,7 +63,7 @@ int main(int argc, char * argv[])
 					case CODE:
 					{
 						printf("word is code\n");
-						printf("rest line:%s\n", buf[line_num]);
+						printf("rest of line:%s\n", buf[line_num]);
 						code_handle_first(labelName, word);
 						break;
 					}

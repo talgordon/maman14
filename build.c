@@ -22,7 +22,7 @@ void build_entry()
 	while(label!=NULL)/*Run as long as label equal to NULL and print the label name and his value.*/
 	{
 		if(label->labelLink == ENTRY_LABEL)/*Check if is entry-print*/
-			fprintf(fp,"%s\t%d\t%d\n", label->labelName, label->labelValue, label->labelLink);
+			fprintf(fp,"%s\t%d \n", label->labelName, label->labelValue);
 		label = label->next;/*If not a entry-one step ahead*/
 	}
 	fclose(fp);/*Close the file*/
@@ -31,22 +31,9 @@ void build_entry()
 /*A function that creates the program output extern files*/
 void build_extern()
 {
-	labelPtr label;
 	FILE *fp;
-	int mask, i;
-	mask = 1;
-	label = (labelPtr)malloc(sizeof(label));
-	label = label_head;
 	fp = fopen("ps.ext", "w");/*Open the file ps.ext*/
-	for(i = 0; i < IC; i++)/*A loop that run on all the IC*/
-	{
-		if(buffer[i]&mask)
-		{
-			fprintf(fp,"%s\t%d\n", label->labelName, i);
-				label = label->next;/*If not a extern-one step ahead*/
-		
-		}
-	}
+	print_extern(fp);
 	fclose(fp);/*Close the file*/
 }
 

@@ -19,10 +19,11 @@ int find_opcode(char * opcode)
 
 int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
 {
-	codeWord firstWord;
+	codeWord * firstWord;
 	int numOfOp_table, numOfOp_line;
+	firstWord = (codeWord *)malloc(sizeof(codeWord));
 	/**get the opcode - first 4 bits in the word**/
-	firstWord.opcode = opcode;
+	firstWord->opcode = opcode;
 
 	/**get the address method - next 8 bits in the word**/
 	
@@ -49,23 +50,23 @@ int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
 		printf("too many\n");
 		add_error(TOO_MANY_OPERANDS);
 	}
-	if (srcType&addressTable[firstWord.opcode].src == 0)	
+	if (srcType&addressTable[firstWord->opcode].src == 0)	
 	{
 		add_error(INVALID_SRC_TYPE);
 		printf("case src\n");	
 	}	
-	if (dstType&addressTable[firstWord.opcode].dst == 0)
+	if (dstType&addressTable[firstWord->opcode].dst == 0)
 	{
 		add_error(INVALID_DST_TYPE);
 		printf("case dst\n");	
 	}
 	printf("src:%d, dst:%d\n", srcType, dstType);
-	firstWord.src = srcType;
-	firstWord.dst = dstType;
+	firstWord->src = srcType;
+	firstWord->dst = dstType;
 		
 	/**get the ARE field - last 4 bits in the word**/
-	firstWord.ARE = A;
-	wPtr.codeWordPtr = &firstWord;
+	firstWord->ARE = A;
+	wPtr.codeWordPtr = firstWord;
 	write_code_image(wPtr, CODE_WORD);
 }
 

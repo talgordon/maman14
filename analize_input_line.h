@@ -4,7 +4,8 @@
 unsigned int DC;
 unsigned int IC;
 unsigned int L;
-char * buf[1000];
+char * inputLine;
+
 typedef enum type{LABEL , DATA , STRING , EXTERN , ENTRY, CODE, END} types;
 
 typedef struct addressMethod *addrMethodPtr;

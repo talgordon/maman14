@@ -42,7 +42,7 @@ void build_object()
 {	
 	FILE *fp;
 	fp = fopen("ps.ob", "w");/*Open the file ps.ob*/
-	fprintf(fp,"\n\t%d,\t%d\n", IC, DC);/*Print the IC and DC*/
-	print_mem(fp);/*Call to the function print_mem that print ????*/
+	fprintf(fp,"\n\t%d,%d\n", IC-100, DC);/*Print the IC and DC*/
+	print_mem(fp);/*Call to the function print_mem that print*/
 	fclose(fp);/*Close the file*/
 }

@@ -38,11 +38,8 @@ void init()
 	addressTable[15].src = 0;
 	addressTable[15].dst = 0;
 	printf("before init buf\n");
-	for(i = 0; i<1000; i++)	
-	{
-		buf[i] = (char *)malloc(sizeof(char)*MAX_LINE);
-		strcpy(buf[i], "empty line");	
-	}
+	
+	inputLine = (char *)malloc(sizeof(char)*MAX_LINE);
 
 	line_num = 0;
 	IC = 100;

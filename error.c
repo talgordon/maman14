@@ -1,46 +1,48 @@
 #include "error.h"
 
+/*A function that add error to a linked list of errors*/
 void add_error(int type)
 {
 	errorPtr tmp, newError;
-	if (error_head == NULL)
+	if (error_head == NULL)/*If the linked list is empty*/
 	{	
-		set_flag("ERROR", 1);
+		set_flag("ERROR", 1);/*Turns on the error flag*/
 		error_head = (errorPtr)malloc(sizeof(error));
-		if(error_head == NULL)
-			add_error(ALLOCATE);
-		error_head->errorType = type;
-		error_head->lineNum = line_num;
-		error_head->next = NULL;
+		if(error_head == NULL)/*If could not allocate space*/
+			add_error(ALLOCATE);/*Print error in allocation place*/
+		error_head->errorType = type;/*Initializes the type in a linked list*/
+		error_head->lineNum = line_num;/*Initializes the line num in a linked list*/
+		error_head->next = NULL;/*Initializes the pointer to NULL*/
 	}
-	else
+	else/*If have a node in a linked list*/
 	{
 		tmp = (errorPtr)malloc(sizeof(error));
 		newError = (errorPtr)malloc(sizeof(error));
-		if((tmp == NULL)||(newError == NULL))
-			add_error(ALLOCATE);
-		tmp = error_head;
-		while(tmp->next != NULL)
+		if((tmp == NULL)||(newError == NULL))/*If could not allocate space*/
+			add_error(ALLOCATE);/*Print error in allocation place*/
+		tmp = error_head;/*Initializes tmp to the top of the list*/
+		while(tmp->next != NULL)/*Loop that run as long as the tmp equal to NULL-end of the list*/
 		{
-			tmp = tmp->next;
+			tmp = tmp->next;/*Initializes the pointer to next node*/
 		}
-		newError->errorType = type;
-		newError->lineNum = line_num;
-		newError->next = NULL;
+		newError->errorType = type;/*Initializes the type in a linked list*/
+		newError->lineNum = line_num;/*Initializes the line num in a linked list*/
+		newError->next = NULL;/*Initializes the pointer to NULL*/
 		tmp->next = newError;
 	}
 }
 
+/*A function that print a error in the linked list with error*/
 void print_error()
 {
 	errorPtr tmp;
 	tmp = (errorPtr)malloc(sizeof(error));
-	if(tmp == NULL)
-		add_error(ALLOCATE);
+	if(tmp == NULL)/*If tmp equal to NULL*/
+		add_error(ALLOCATE);/*Print error in allocation place*/
 	tmp = error_head;
-	while(tmp != NULL)
+	while(tmp != NULL)/*Loop that run as long as the tmp equal to NULL-end of the list*/
 	{
-		switch(tmp->errorType)
+		switch(tmp->errorType)/*Switch depending on the type of error. Finds the appropriate error, prints the error type to the user, and leaves the loop.*/
 		{
 			case ALLOCATE:
 				fprintf(stderr, "can not allocate memory");
@@ -102,6 +104,7 @@ void print_error()
 	}
 }
 
+/*A function that returns the value of the flag in the data structure*/
 int get_flag(char * name)
 {
 	if (strcmp(name, "ERROR") == 0)
@@ -113,6 +116,7 @@ int get_flag(char * name)
 	return ERROR;
 }
 
+/*A function that lights a flag in the data structrue*/
 void set_flag(char *name, int value)
 {
 	if (strcmp(name, "ERROR") == 0)

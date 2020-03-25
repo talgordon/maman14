@@ -1,6 +1,7 @@
 #include "error.h"
 #include "label.h"
 
+/*A function that accepts a word and check if the word is word that the code knows*/
 int isreserved(char * word)
 {
 	if ((strcmp(word, "string") == 0 )|| (strcmp(word, "data") == 0) || (strcmp(word, "extern") == 0) || (strcmp(word, "entry") == 0))
@@ -11,7 +12,8 @@ int isreserved(char * word)
 		return 0;
 	return 1;
 }
-	
+
+/*A function that check if the word that she get is legal andd return 0/1*/
 int isillegal(char * word)
 {
 	int i;
@@ -22,6 +24,7 @@ int isillegal(char * word)
 	} 
 	return 1;
 }
+
 /*A function that print a label name, label value and his type*/
 void print_label()
 {
@@ -57,7 +60,6 @@ void add_label(char * name, int value, int type, int link)
 	labelPtr tmp, newLabel;	
 	if (name[strlen(name)-1] == ':')
 		name[strlen(name)-1] = '\0';
-	printf("name is: %s\n", name);
 	if (label_head == NULL)/*If the list is empty*/
 	{	
 		label_head = (labelPtr)malloc(sizeof(label));
@@ -179,7 +181,7 @@ int update_label(int update, int updateType, int labelID, int IDType, char *name
 		return ERROR;
 	}	
 	tmp = label_head;
-	while(tmp != NULL)/*Loop that run as long as the temp isn't equle to null*/
+	while(tmp != NULL)/*Loop that run as long as the temp isn't equle to null and update the label*/
 	{
 		if ((strcmp(tmp->labelName, name) == 0)||((strcmp(name, "ALL") == 0) && (((IDType == LABEL_TYPE) && (labelID == tmp->labelType)) || ((IDType == LABEL_LINK) && (labelID == tmp->labelLink)))))
 		{
@@ -209,11 +211,10 @@ int update_label(int update, int updateType, int labelID, int IDType, char *name
 	return ERROR;
 }
 
-
+/*A function that add a extern to a linked list with exrerns*/
 void add_extern(char * name, int value)
 {
 	externPtr tmp, newExtern;	
-	printf("name is: %s\n", name);
 	if (extern_head == NULL)/*If the list is empty*/
 	{	
 		extern_head = (externPtr)malloc(sizeof(externLabel));
@@ -251,6 +252,7 @@ void add_extern(char * name, int value)
 	}
 }
 
+/*A function that print the linked list with externs*/
 void print_extern(FILE * fp)
 {
 	externPtr tmp;

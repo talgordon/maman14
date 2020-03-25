@@ -6,12 +6,14 @@
 int main(int argc, char * argv[])
 {
 	char * word;
+	char * buf;
 	char * labelName;
 	FILE *ptr;
 	int i;
 	int wordType;
 	word = (char *)malloc(sizeof(char)*MAX_WORD);
 	labelName = (char *)malloc(sizeof(char)*MAX_WORD);
+	buf = (char *)malloc(sizeof(char)*MAX_LINE);
 	init();/**add IC, DC, L.. and other values**/
 	printf("finish init\n");
 	for (i=1; i<argc; i++)
@@ -23,21 +25,23 @@ int main(int argc, char * argv[])
 		}
 		printf("file opened successfuly\n");
 		line_num = 0;/**new file**/
-		memset(buf[line_num], '\0', strlen(buf[line_num]));
+		memset(buf, '\0', strlen(buf));
 		
-		while(fgets(buf[line_num], MAX_LINE, ptr)!=NULL)/*scan all the lines in the file*/
+		while(fgets(buf, MAX_LINE, ptr)!=NULL)/*scan all the lines in the file*/
 		{
+			inputLine = buf;
+			printf("after read\n");
 			set_flag("LABEL",0);
-			printf("line was read, line is:%s\n", buf[line_num]);
-			if (!((buf[line_num][0] == '\n')||((buf[line_num][0] == '/')&&(buf[line_num][1] == '*')&&(buf[line_num][strlen(buf[line_num])-3] == '*')&& (buf[line_num][strlen(buf[line_num])-2] == '/'))))
+			printf("inputLine was read, inputLine is:%s, buf is:%s\n",inputLine,  buf);
+			if (!((inputLine[0] == '\n')||((inputLine[0] == '/')&&(inputLine[1] == '*')&&(inputLine[strlen(inputLine)-3] == '*')&& (inputLine[strlen(inputLine)-2] == '/'))))
 			{	
-				wordType = get_word(&buf[line_num], &word);
+				wordType = get_word(&inputLine, &word);
 				if (wordType == LABEL)
 				{
 					printf("word is a label\n");
 					set_flag("LABEL", 1);
 					strcpy(labelName, word);
-					wordType = get_word(&buf[line_num], &word);
+					wordType = get_word(&inputLine, &word);
 				}
 				switch (wordType)
 				{
@@ -56,14 +60,14 @@ int main(int argc, char * argv[])
 					case EXTERN:
 					{
 						printf("word is extern\n");
-						printf("rest line:%s\n", buf[line_num]);
+						printf("rest inputLine:%s\n", inputLine);
 						extern_handle();
 						break;
 					}
 					case CODE:
 					{
 						printf("word is code\n");
-						printf("rest of line:%s\n", buf[line_num]);
+						printf("rest of inputLine:%s\n", inputLine);
 						code_handle_first(labelName, word);
 						break;
 					}
@@ -74,8 +78,10 @@ int main(int argc, char * argv[])
 				
 				}
 			}
-			printf("moving to the next line, line_num:%d\n", line_num);
+			printf("moving to the next inputLine, line_num:%dline:%s\n", line_num, inputLine);
 			line_num++;
+			memset(buf, '\0', strlen(buf));
+			printf("after line_Num, buf:%p\n", buf);
 		}
 		fclose(ptr);
 	}	
@@ -99,16 +105,18 @@ int main(int argc, char * argv[])
 			exit(1);
 		}
 		line_num = 0;/**new file**/
-		memset(buf[line_num], '\0', strlen(buf[line_num]));
+		memset(buf, '\0', MAX_LINE);
 		
-		while(fgets(buf[line_num], sizeof(buf), ptr)!=NULL)/*scan all the lines in the file*/
+		while(fgets(buf, MAX_LINE, ptr)!=NULL)/*scan all the lines in the file*/
 		{
-			if (!((buf[line_num][0] == '\n')||((buf[line_num][0] == '/')&&(buf[line_num][1] == '*')&&(buf[line_num][strlen(buf[line_num])-3] == '*')&& (buf[line_num][strlen(buf[line_num])-2] == '/'))))
+			inputLine = buf;
+			printf("inputLine was read, inputLine is:%s, buf is:%s\n",inputLine,  buf);
+			if (!((inputLine[0] == '\n')||((inputLine[0] == '/')&&(inputLine[1] == '*')&&(inputLine[strlen(inputLine)-3] == '*')&& (inputLine[strlen(inputLine)-2] == '/'))))
 			{			
-				wordType = get_word(&buf[line_num], &labelName);
+				wordType = get_word(&inputLine, &labelName);
 				if (wordType == LABEL)
 				{
-					wordType = get_word(&buf[line_num], &word);
+					wordType = get_word(&inputLine, &word);
 				}
 				switch (wordType)
 				{
@@ -136,8 +144,9 @@ int main(int argc, char * argv[])
 				
 				}
 			}
-			printf("moving to the next line, line_num:%d\n", line_num);
+			printf("moving to the next inputLine, line_num:%d\n", line_num);
 			line_num++;
+			memset(buf, '\0', MAX_LINE);
 		}
 		fclose(ptr);
 	}

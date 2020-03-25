@@ -74,11 +74,16 @@ unsigned int buffer[4096];
 int write_data_image(dataWord dWord);
 int write_code_image(wordPtr ptr, int type);
 int print_mem();
+
+/*A function that encodes a number using the two complement method*/
 int two_complement(int num);
 
+/*A function that find the opcode in the array*/
 int find_opcode(char * opcode);
+/*A function that encodes insruction to binary memory word*/
 int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType);
 int finish_translate(char *line, wordPtr wPtr);
+/*A function that encodes guidance to binary memory word*/
 int translate_data(int type, char * line);
 
 

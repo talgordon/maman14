@@ -3,13 +3,14 @@
 #include "error.h"
 #include "label.h"
 
-
+/*An array with the opcode name*/
 const char * opcodeTable[16] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
+
+/*A function that find the opcode in the array*/
 int find_opcode(char * opcode)
 {
 	int i;
-	printf("in fine_opcode, opcode:%s\n", opcode);
-	for(i = 0; i<16; i++)
+	for(i = 0; i<16; i++)/*A loop that run on the array and compares between the opcode she accepts and the place in opcodeTable*/
 	{
 		if (strcmp(opcode, opcodeTable[i]) == 0)
 			return i;
@@ -17,6 +18,7 @@ int find_opcode(char * opcode)
 	return -1;
 }
 
+/*A function that encodes insruction to binary memory word*/
 int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
 {
 	codeWord * firstWord;
@@ -39,28 +41,23 @@ int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
 		numOfOp_line++;
 	if (dstType != 0)
 		numOfOp_line++;
-	printf("numOfOp_table:%d, numOfOp_line:%d\n",numOfOp_table , numOfOp_line);
+
 	if(numOfOp_table > numOfOp_line)
 	{
-		printf("too few\n");
 		add_error(TOO_FEW_OPERANDS);
 	}
 	if(numOfOp_table < numOfOp_line)
 	{
-		printf("too many\n");
 		add_error(TOO_MANY_OPERANDS);
 	}
 	if (srcType&addressTable[firstWord->opcode].src == 0)	
 	{
 		add_error(INVALID_SRC_TYPE);
-		printf("case src\n");	
 	}	
 	if (dstType&addressTable[firstWord->opcode].dst == 0)
 	{
 		add_error(INVALID_DST_TYPE);
-		printf("case dst\n");	
 	}
-	printf("src:%d, dst:%d\n", srcType, dstType);
 	firstWord->src = srcType;
 	firstWord->dst = dstType;
 		
@@ -80,30 +77,24 @@ int finish_translate(char *line, wordPtr wPtr)
 	dstName = (char *)malloc(sizeof(char)*MAX_WORD);
 	srcType = 0;
 	dstType = 0;
-	printf("in finish translate, line:%s\n", line);
+
 	get_operand(line, &srcType, &dstType, &srcName, &dstName, 2);
-	printf("in finish translate, after get operands- srcType:%d, dstType:%d, srcName:%s, dstName:%s\n", srcType, dstType, srcName, dstName);
 	/**get the info words, one, two or non at all**/	
-	if(dstType == 0)
+	if(dstType == 0)/*If is not have oparends*/
 	{
-		printf("no operands\n");
 		return 0;
 	}
-	if((srcType == IMMEDIATE) || (srcType == DIRECT))
+	if((srcType == IMMEDIATE) || (srcType == DIRECT))/*If src is IMMEDIATE OR DIRECT*/
 	{
 		infoWordData srcInfo;
-		printf("src is IMMEDIATE OR DIRECT\n");
-		if(srcType == IMMEDIATE)
+		if(srcType == IMMEDIATE)/*If src is IMMEDIATE*/
 		{
-			printf("src is IMMEDIATE\n");
 			srcInfo.data = atoi(srcName);
 			srcInfo.ARE = A;
-			printf("finish case IMMEDIATE\n");
 		}
-		else/*direct*/
+		else/*If src is direct*/
 		{
 			labelPtr label;
-			printf("src is DIRECT\n");
 			label = (labelPtr)malloc(sizeof(label));
 			get_label(srcName, 0, 0, &label);
 			if(label->labelLink == EXTERN_LABEL)
@@ -117,20 +108,16 @@ int finish_translate(char *line, wordPtr wPtr)
 				srcInfo.ARE = R;
 				srcInfo.data = label->labelValue;
 			}
-			printf("finish case DIRECT\n");
 		}
 		wPtr.dataWordPtr = &srcInfo;
-		printf("call to write code image with:data=%d, ARE=%d\n", wPtr.dataWordPtr->data, wPtr.dataWordPtr->ARE);
 		write_code_image(wPtr, DATA_WORD);
 		IC++;
-		printf("finish write_code_image\n");
 	}
 	else 
 	{
-		if (((srcType == DIRECT_REGISTER) || (srcType == INDIRECT_REGISTER)))
+		if (((srcType == DIRECT_REGISTER) || (srcType == INDIRECT_REGISTER)))/*If src is DIRECT_REG OR INDIRECT_REG*/
 		{
 			infoWordReg srcInfoReg;
-			printf("src is DIRECT_REG OR INDIRECT_REG\n");
 			srcInfoReg.srcReg = atoi(srcName);
 			srcInfoReg.ARE = A;
 			if ((dstType == INDIRECT_REGISTER) || (dstType == DIRECT_REGISTER))
@@ -141,79 +128,70 @@ int finish_translate(char *line, wordPtr wPtr)
 			}
 			srcInfoReg.rest = 0;
 			wPtr.regWordPtr = &srcInfoReg;
-			printf("call to write code image with:srcType=%d,dstType=%d, ARE=%d, rest=%d\n", wPtr.regWordPtr->srcReg, wPtr.regWordPtr->dstReg, wPtr.regWordPtr->ARE, wPtr.regWordPtr->rest);
+		
 			write_code_image(wPtr, DATA_REG_WORD);
 			IC++;
-			printf("finish write_code_image\n");
 		}
 	}
-	printf("dstType:%d\n", dstType);
+
 	if((dstType == IMMEDIATE) || (dstType == DIRECT))
 	{
 		infoWordData dstInfo;
-		if(dstType == IMMEDIATE)
+		if(dstType == IMMEDIATE)/*If is immideate*/
 		{
-			printf("case immideate\n");
 			dstInfo.data = atoi(dstName);
 			dstInfo.ARE = A;
-			printf("finish case immidiate\n");
 		}
-		else
+		else/*If is direct*/
 		{
 			labelPtr label;
-			printf("case direct\n");
 			label = (labelPtr)malloc(sizeof(label));
 			get_label(dstName, 0, 0, &label);
-			printf("label_name:%s, label_value:%d, label_type:%d, label_link:%d\n", label->labelName, label->labelValue, label->labelType, label->labelLink);
+			
 			if(label->labelLink == EXTERN_LABEL)
 			{
 				dstInfo.ARE = E;
 				dstInfo.data = 0;
 				add_extern(label->labelName, IC);
-				printf("ARE:%d\n", dstInfo.ARE);
 			}
 			else
 			{
 				dstInfo.ARE = R;
 				dstInfo.data = label->labelValue;
 			}
-			printf("finish case direct\n");
 		}
 		wPtr.dataWordPtr = &dstInfo;
-		printf("call to write code image with:data=%d, ARE=%d\n", wPtr.dataWordPtr->data, wPtr.dataWordPtr->ARE);
+		
 		write_code_image(wPtr, DATA_WORD);
 		IC++;
-		printf("finish write_code_image\n");
 	}
 	else
-		if (!(((srcType == DIRECT_REGISTER) || (srcType == INDIRECT_REGISTER)) && ((dstType == DIRECT_REGISTER) || (dstType == INDIRECT_REGISTER))))	
+		if (!(((srcType == DIRECT_REGISTER) || (srcType == INDIRECT_REGISTER)) && ((dstType == DIRECT_REGISTER) || (dstType == INDIRECT_REGISTER))))/*If is reg*/
 		{
 			infoWordReg dstInfoReg;
-			printf("case reg\n");
 			dstInfoReg.dstReg = atoi(dstName);
 			dstInfoReg.ARE = A;
 			dstInfoReg.srcReg = 0;
 			dstInfoReg.rest = 0;
 			wPtr.regWordPtr = &dstInfoReg;
-			printf("call to write code image with:srcType=%d,dstType=%d, ARE=%d, rest=%d\n", wPtr.regWordPtr->srcReg, wPtr.regWordPtr->dstReg, wPtr.regWordPtr->ARE, wPtr.regWordPtr->rest);
+			
 			write_code_image(wPtr, DATA_REG_WORD);
 			IC++;
-			printf("finish write code image\n");
 		}
 			
 	
 }
 
+/*A function that encodes guidance to binary memory word*/
 int translate_data(int type, char * line)
 {
 	dataWord word;
 	int c;
 	int num;
-	if (type == DATA)
+	if (type == DATA)/*If is data*/
 	{
-		printf("case DATA\n");
 		skip_spaces(&line);
-		if (*line == '\n')
+		if (*line == '\n')/*If the line is empty, error*/
 		{
 			add_error(MISSING_DATA);
 			return 0;
@@ -222,17 +200,14 @@ int translate_data(int type, char * line)
 		{
 			
 			word.data = num;
-			printf("call write_data_image with %d\n", num);
 			write_data_image(word);
-			printf("finish data_image\n");
 		}
 	}
 
-	if(type == STRING)
+	if(type == STRING)/*If is string*/
 	{
-		printf("case STRING\n");
 		skip_spaces(&line);
-		if (*line == '\n')
+		if (*line == '\n')/*If the line is empty, error*/
 		{
 			add_error(MISSING_DATA);
 			return 0;
@@ -241,7 +216,6 @@ int translate_data(int type, char * line)
 		while(((c = *line) != '\n')&&(c != '"'))
 		{
 			word.data = c;
-			printf("call write_data_image with %c\n", c);
 			write_data_image(word);
 			line++;
 		}
@@ -250,6 +224,8 @@ int translate_data(int type, char * line)
 	}
 	return 0;
 }
+
+/*A function that encodes a number using the two complement method*/
 int two_complement(int num)
 {
 	return (~num)+1;

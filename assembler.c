@@ -3,6 +3,8 @@
 #include "label.h"
 #include "modules.h"
 #include "build.h"
+
+/*Main program*/
 int main(int argc, char * argv[])
 {
 	char * word;
@@ -14,60 +16,50 @@ int main(int argc, char * argv[])
 	word = (char *)malloc(sizeof(char)*MAX_WORD);
 	labelName = (char *)malloc(sizeof(char)*MAX_WORD);
 	buf = (char *)malloc(sizeof(char)*MAX_LINE);
-	init();/**add IC, DC, L.. and other values**/
-	printf("finish init\n");
-	for (i=1; i<argc; i++)
+	init();/*Initialization of the variabels*/
+	for (i=1; i<argc; i++)/*Run on the file*/
 	{	
-		if((ptr = fopen(argv[i], "r")) == NULL)
+		if((ptr = fopen(argv[i], "r")) == NULL)/*If could not open the file, error*/
 		{
 			add_error(CANNOT_OPEN_FILE);
 			exit(1);
 		}
-		printf("file opened successfuly\n");
-		line_num = 0;/**new file**/
+		line_num = 0;/*new file*/
 		memset(buf, '\0', strlen(buf));
 		
 		while(fgets(buf, MAX_LINE, ptr)!=NULL)/*scan all the lines in the file*/
 		{
 			inputLine = buf;
-			printf("after read\n");
 			set_flag("LABEL",0);
-			printf("inputLine was read, inputLine is:%s, buf is:%s\n",inputLine,  buf);
-			if (!((inputLine[0] == '\n')||((inputLine[0] == '/')&&(inputLine[1] == '*')&&(inputLine[strlen(inputLine)-3] == '*')&& (inputLine[strlen(inputLine)-2] == '/'))))
+			
+			if (!((inputLine[0] == '\n')||((inputLine[0] == '/')&&(inputLine[1] == '*')&&(inputLine[strlen(inputLine)-3] == '*')&& (inputLine[strlen(inputLine)-2] == '/'))))/*Check if the word is symbol*/
 			{	
 				wordType = get_word(&inputLine, &word);
-				if (wordType == LABEL)
+				if (wordType == LABEL)/*If the word is label*/
 				{
-					printf("word is a label\n");
-					set_flag("LABEL", 1);
+					set_flag("LABEL", 1);/*Turns on the flag- there is an label*/
 					strcpy(labelName, word);
 					wordType = get_word(&inputLine, &word);
 				}
-				switch (wordType)
+				switch (wordType)/*Check the type*/
 				{
-					case DATA:
+					case DATA:/*If is data or string-call to data_handle to treatment*/
 					case STRING:
 					{
-						printf("word is data or string\n");
 						data_handle(labelName, wordType);
 						break;
 					}
-					case ENTRY:
+					case ENTRY:/*If is entry-does not do anything. Willl be addressed in the second pass*/
 					{
-						printf("word is entry\n");
 						break;
 					}
-					case EXTERN:
+					case EXTERN:/*If is entry-call to extern_handle to treatment*/
 					{
-						printf("word is extern\n");
-						printf("rest inputLine:%s\n", inputLine);
 						extern_handle();
 						break;
 					}
-					case CODE:
+					case CODE:/*This is instruction-call to code_handle_first to treatment*/
 					{
-						printf("word is code\n");
-						printf("rest of inputLine:%s\n", inputLine);
 						code_handle_first(labelName, word);
 						break;
 					}
@@ -78,28 +70,26 @@ int main(int argc, char * argv[])
 				
 				}
 			}
-			printf("moving to the next inputLine, line_num:%dline:%s\n", line_num, inputLine);
+		
 			line_num++;
 			memset(buf, '\0', strlen(buf));
-			printf("after line_Num, buf:%p\n", buf);
+
 		}
-		fclose(ptr);
+		fclose(ptr);/*Close the file*/
 	}	
 	if (get_flag("ERROR") == 1)/*there are errors in the code*/
 	{
-		printf("there are errors\n");
-		print_error();
+		print_error();/*Print all the error*/
 		
 	}
-	update_label(IC, LABEL_VALUE, DATA, LABEL_TYPE, "ALL");
+	update_label(IC, LABEL_VALUE, DATA, LABEL_TYPE, "ALL");/*Updates the values in the symbol tabel*/
 	
-	printf("start second loop, IC:%d, DC:%d\n", IC, DC);
-	print_label();
+	print_label();/*Print the label*/
 	line_num = 0;
 	IC = 100;
-	for (i=1; i<argc; i++)
+	for (i=1; i<argc; i++)/*Run on the file*/
 	{	
-		if((ptr = fopen(argv[i], "r")) == NULL)
+		if((ptr = fopen(argv[i], "r")) == NULL)/*If could not to open the file,error*/
 		{
 			add_error(CANNOT_OPEN_FILE);
 			exit(1);
@@ -110,29 +100,28 @@ int main(int argc, char * argv[])
 		while(fgets(buf, MAX_LINE, ptr)!=NULL)/*scan all the lines in the file*/
 		{
 			inputLine = buf;
-			printf("inputLine was read, inputLine is:%s, buf is:%s\n",inputLine,  buf);
-			if (!((inputLine[0] == '\n')||((inputLine[0] == '/')&&(inputLine[1] == '*')&&(inputLine[strlen(inputLine)-3] == '*')&& (inputLine[strlen(inputLine)-2] == '/'))))
+			
+			if (!((inputLine[0] == '\n')||((inputLine[0] == '/')&&(inputLine[1] == '*')&&(inputLine[strlen(inputLine)-3] == '*')&& (inputLine[strlen(inputLine)-2] == '/'))))/**/
 			{			
 				wordType = get_word(&inputLine, &labelName);
-				if (wordType == LABEL)
+				if (wordType == LABEL)/*If the word is label*/
 				{
 					wordType = get_word(&inputLine, &word);
 				}
-				switch (wordType)
+				switch (wordType)/*Swith that check the type*/
 				{
-					case DATA:
+					case DATA:/*If is data/string/extern-skip*/
 					case STRING:
 					case EXTERN:
 					{
 						break;
 					}
-					case ENTRY:
+					case ENTRY:/*If is entry-call to entry_handle to treatment*/
 					{
-						printf("word is entry\n");
 						entry_handle();
 						break;
 					}
-					case CODE:
+					case CODE:/*If is entry-call to entry_handle to treatment*/
 					{
 						code_handle_second();
 						break;
@@ -144,20 +133,18 @@ int main(int argc, char * argv[])
 				
 				}
 			}
-			printf("moving to the next inputLine, line_num:%d\n", line_num);
 			line_num++;
 			memset(buf, '\0', MAX_LINE);
 		}
-		fclose(ptr);
+		fclose(ptr);/*Close the file*/
 	}
-	printf("after second loop: IC=%d, DC=%d\n",IC, DC);
+
 	if (get_flag("ERROR") == 1)/*there are errors in the code*/
 	{
-		printf("there are errors\n");
-		print_error();
+		print_error();/*Print the error*/
 	
 	}
-	build_output();
+	build_output();/*Call to build_out to build the file output*/
 	return 0;	
 
 

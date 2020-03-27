@@ -58,16 +58,16 @@ void code_handle_first(char * labelName, char * word)
 
 	get_operand(inputLine, &srcType, &dstType, &srcName, &dstName, FIRST);/*Call to get_operand*/
 	L = 1;
-	if (dstType != NO_OPERAND)
+	if (dstType != NO_OPERAND)/*If is have operands*/
 	{
 		L++;
 		if (!((srcType == DIRECT_REGISTER || srcType == INDIRECT_REGISTER) && (dstType == DIRECT_REGISTER || dstType == INDIRECT_REGISTER)) && (srcType != NO_OPERAND))
 			L++;
 	}
-	translate_code(wPtr, opcode, srcType, dstType);
+	translate_code(wPtr, opcode, srcType, dstType);/*Call to translate_code*/
 	IC = IC + L;
-	free(srcName);
-	free(dstName);
+	free(srcName);/*Free srcName*/
+	free(dstName);/*Free dstName*/
 	
 }
 
@@ -123,8 +123,10 @@ void init()
 	L = 0;
 }
 
+/*A function that free all the list*/
 void free_list(char * name)
 {
+	/*Free the linked list with errors*/
 	if(strcmp(name, "error") == 0)
 	{
 		errorPtr tmp;
@@ -135,10 +137,10 @@ void free_list(char * name)
 			free(tmp);
 		}
 	}
-	else
+	else/*If is not linked list with errors*/
 	{	
 		memWordPtr tmp;
-		if(strcmp(name, "memWord") == 0)
+		if(strcmp(name, "memWord") == 0)/*If is memWord*/
 		{
 			while (data_head != NULL)
 			{
@@ -150,7 +152,7 @@ void free_list(char * name)
 		else
 		{
 			labelPtr tmp;
-			if(strcmp(name, "label") == 0)
+			if(strcmp(name, "label") == 0)/*If is label*/
 			{
 				while (label_head != NULL)
 				{
@@ -163,7 +165,7 @@ void free_list(char * name)
 			else
 			{	
 				externPtr tmp;
-				if(strcmp(name, "extern") == 0)
+				if(strcmp(name, "extern") == 0)/*If is extern*/
 				{
 					while (extern_head != NULL)
 					{

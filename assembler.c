@@ -1,4 +1,5 @@
 #include "analize_input_line.h"
+#include "analize_code_word.h"
 #include "error.h"
 #include "label.h"
 #include "modules.h"
@@ -30,14 +31,14 @@ int main(int argc, char * argv[])
 		while(fgets(buf, MAX_LINE, ptr)!=NULL)/*scan all the lines in the file*/
 		{
 			inputLine = buf;
-			set_flag("LABEL",0);
+			set_flag("LABEL",IS_FALSE);
 			
 			if (!((inputLine[0] == '\n')||((inputLine[0] == '/')&&(inputLine[1] == '*')&&(inputLine[strlen(inputLine)-3] == '*')&& (inputLine[strlen(inputLine)-2] == '/'))))/*Check if the word is symbol*/
 			{	
 				wordType = get_word(&inputLine, &word);
 				if (wordType == LABEL)/*If the word is label*/
 				{
-					set_flag("LABEL", 1);/*Turns on the flag- there is an label*/
+					set_flag("LABEL", IS_TRUE);/*Turns on the flag- there is an label*/
 					strcpy(labelName, word);
 					wordType = get_word(&inputLine, &word);
 				}
@@ -77,15 +78,14 @@ int main(int argc, char * argv[])
 		}
 		fclose(ptr);/*Close the file*/
 	}	
-	if (get_flag("ERROR") == 1)/*there are errors in the code*/
+	if (get_flag("ERROR") == IS_TRUE)/*there are errors in the code*/
 	{
 		print_error();/*Print all the error*/
+		return 0;/*finish the program. There is no reason to keep going since the code is illigal*/
 		
 	}
 	update_label(IC, LABEL_VALUE, DATA, LABEL_TYPE, "ALL");/*Updates the values in the symbol tabel*/
 	
-	print_label();/*Print the label*/
-	line_num = 0;
 	IC = 100;
 	for (i=1; i<argc; i++)/*Run on the file*/
 	{	
@@ -139,12 +139,21 @@ int main(int argc, char * argv[])
 		fclose(ptr);/*Close the file*/
 	}
 
-	if (get_flag("ERROR") == 1)/*there are errors in the code*/
+	if (get_flag("ERROR") == IS_TRUE)/*there are errors in the code*/
 	{
 		print_error();/*Print the error*/
+		return 0;
 	
 	}
-	build_output();/*Call to build_out to build the file output*/
+	else
+		build_output();/*Call to build_out to build the file output*/
+	free(buf);
+	free(labelName);
+	free(word);
+	free_list("error");
+	free_list("memWord");
+	free_list("label");
+	free_list("extern");
 	return 0;	
 
 

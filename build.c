@@ -26,6 +26,7 @@ void build_entry()
 		label = label->next;/*If not a entry-one step ahead*/
 	}
 	fclose(fp);/*Close the file*/
+	free(label);
 }
 
 /*A function that creates the program output extern files*/

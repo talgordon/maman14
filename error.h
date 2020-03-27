@@ -3,6 +3,8 @@
 #include <string.h>
 #define ERROR -1
 #define SUCCESS 0
+#define IS_TRUE 1
+#define IS_FALSE 0
 #define NO_ADDRESS 0
 
 typedef struct PSW{

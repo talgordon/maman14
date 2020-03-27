@@ -2,6 +2,7 @@
 #include "error.h"
 #include "label.h"
 #include "modules.h"
+
 /*A function that skip white spaces.*/
 void skip_spaces(char **line)
 {
@@ -153,7 +154,7 @@ types get_word(char * line[MAX_LINE], char **word)
 			return EXTERN;
 		}
 
-		else if(strcmp(*word,".entry")==0)
+		else if(strcmp(*word,".entry")==0)/*Check if is entry-return ENTRY*/
 		{
 			return ENTRY;
 		}
@@ -175,7 +176,7 @@ void get_operand(char * line, int *srcType, int *dstType, char ** srcName, char 
 		*dstType = NO_OPERAND;
 		*dstName = NULL;
 	}
-	else
+	else/*If is have a operands*/
 	{
 		str = (char *)malloc(sizeof(char)*MAX_WORD);
 		memset(str, '\0', strlen(str));

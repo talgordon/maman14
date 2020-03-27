@@ -8,5 +8,10 @@ void entry_handle();
 void code_handle_first(char * labelName, char * word);
 /*A function that call to finish_translate to finish a translate the input line*/
 void code_handle_second();
+/*A function that initializes global variables using code*/
+void init();
+void free_mem(char * name);
+
+
 
 

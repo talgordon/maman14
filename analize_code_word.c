@@ -4,42 +4,41 @@
 #include "label.h"
 
 /*An array with the opcode name*/
-const char * opcodeTable[16] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
+const char * opcodeTable[NUM_OF_OPCODE] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 
 /*A function that find the opcode in the array*/
 int find_opcode(char * opcode)
 {
 	int i;
-	for(i = 0; i<16; i++)/*A loop that run on the array and compares between the opcode she accepts and the place in opcodeTable*/
+	for(i = 0; i<NUM_OF_OPCODE; i++)/*A loop that run on the array and compares between the opcode she accepts and the place in opcodeTable*/
 	{
 		if (strcmp(opcode, opcodeTable[i]) == 0)
 			return i;
 	}
-	return -1;
+	return ERROR;
 }
 
 /*A function that encodes insruction to binary memory word*/
-int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
+void translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
 {
 	codeWord * firstWord;
 	int numOfOp_table, numOfOp_line;
 	firstWord = (codeWord *)malloc(sizeof(codeWord));
 	/**get the opcode - first 4 bits in the word**/
 	firstWord->opcode = opcode;
-
 	/**get the address method - next 8 bits in the word**/
 	
 	numOfOp_table = 0;
 	numOfOp_line = 0;
-	if (addressTable[opcode].src != 0)
+	if (addressTable[opcode].src != NO_OPERAND)
 	{
 		numOfOp_table++;
 	}
-	if (addressTable[opcode].dst != 0)
+	if (addressTable[opcode].dst != NO_OPERAND)
 		numOfOp_table++;
-	if (srcType != 0)
+	if (srcType != NO_OPERAND)
 		numOfOp_line++;
-	if (dstType != 0)
+	if (dstType != NO_OPERAND)
 		numOfOp_line++;
 
 	if(numOfOp_table > numOfOp_line)
@@ -50,11 +49,11 @@ int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
 	{
 		add_error(TOO_MANY_OPERANDS);
 	}
-	if (srcType&addressTable[firstWord->opcode].src == 0)	
+	if (srcType&addressTable[firstWord->opcode].src == IS_FALSE)	
 	{
 		add_error(INVALID_SRC_TYPE);
 	}	
-	if (dstType&addressTable[firstWord->opcode].dst == 0)
+	if (dstType&addressTable[firstWord->opcode].dst == IS_FALSE)
 	{
 		add_error(INVALID_DST_TYPE);
 	}
@@ -65,9 +64,10 @@ int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
 	firstWord->ARE = A;
 	wPtr.codeWordPtr = firstWord;
 	write_code_image(wPtr, CODE_WORD);
+	free(firstWord);
 }
 
-int finish_translate(char *line, wordPtr wPtr)
+void finish_translate(char *line, wordPtr wPtr)
 {
 	char * srcName;
 	char * dstName;
@@ -78,11 +78,13 @@ int finish_translate(char *line, wordPtr wPtr)
 	srcType = 0;
 	dstType = 0;
 
-	get_operand(line, &srcType, &dstType, &srcName, &dstName, 2);
+	get_operand(line, &srcType, &dstType, &srcName, &dstName, SECOND);
 	/**get the info words, one, two or non at all**/	
-	if(dstType == 0)/*If is not have oparends*/
+	if(dstType == NO_OPERAND)/*If is not have oparends*/
 	{
-		return 0;
+		free(srcName);
+		free(dstName);
+		return;
 	}
 	if((srcType == IMMEDIATE) || (srcType == DIRECT))/*If src is IMMEDIATE OR DIRECT*/
 	{
@@ -95,12 +97,11 @@ int finish_translate(char *line, wordPtr wPtr)
 		else/*If src is direct*/
 		{
 			labelPtr label;
-			label = (labelPtr)malloc(sizeof(label));
-			get_label(srcName, 0, 0, &label);
+			label = get_label(srcName, NOTHING, NOTHING, label);
 			if(label->labelLink == EXTERN_LABEL)
 			{			
 				srcInfo.ARE = E;
-				srcInfo.data = 0;
+				srcInfo.data = EMPTY;
 				add_extern(label->labelName, IC);
 			}
 			else
@@ -124,9 +125,9 @@ int finish_translate(char *line, wordPtr wPtr)
 				srcInfoReg.dstReg = atoi(dstName);
 			else
 			{
-				srcInfoReg.dstReg = 0;
+				srcInfoReg.dstReg = EMPTY;
 			}
-			srcInfoReg.rest = 0;
+			srcInfoReg.rest = EMPTY;
 			wPtr.regWordPtr = &srcInfoReg;
 		
 			write_code_image(wPtr, DATA_REG_WORD);
@@ -145,13 +146,11 @@ int finish_translate(char *line, wordPtr wPtr)
 		else/*If is direct*/
 		{
 			labelPtr label;
-			label = (labelPtr)malloc(sizeof(label));
-			get_label(dstName, 0, 0, &label);
-			
+			label = get_label(dstName, NOTHING, NOTHING, label);
 			if(label->labelLink == EXTERN_LABEL)
 			{
 				dstInfo.ARE = E;
-				dstInfo.data = 0;
+				dstInfo.data = EMPTY;
 				add_extern(label->labelName, IC);
 			}
 			else
@@ -171,19 +170,21 @@ int finish_translate(char *line, wordPtr wPtr)
 			infoWordReg dstInfoReg;
 			dstInfoReg.dstReg = atoi(dstName);
 			dstInfoReg.ARE = A;
-			dstInfoReg.srcReg = 0;
-			dstInfoReg.rest = 0;
+			dstInfoReg.srcReg = EMPTY;
+			dstInfoReg.rest = EMPTY;
 			wPtr.regWordPtr = &dstInfoReg;
 			
 			write_code_image(wPtr, DATA_REG_WORD);
 			IC++;
 		}
+	free(srcName);
+	free(dstName);
 			
 	
 }
 
 /*A function that encodes guidance to binary memory word*/
-int translate_data(int type, char * line)
+void translate_data(int type, char * line)
 {
 	dataWord word;
 	int c;
@@ -194,7 +195,7 @@ int translate_data(int type, char * line)
 		if (*line == '\n')/*If the line is empty, error*/
 		{
 			add_error(MISSING_DATA);
-			return 0;
+			return;
 		}
 		while((num = get_data(&line))!= EOF)
 		{
@@ -210,7 +211,7 @@ int translate_data(int type, char * line)
 		if (*line == '\n')/*If the line is empty, error*/
 		{
 			add_error(MISSING_DATA);
-			return 0;
+			return;
 		}
 		line++;
 		while(((c = *line) != '\n')&&(c != '"'))
@@ -222,11 +223,5 @@ int translate_data(int type, char * line)
 		word.data = 0;
 		write_data_image(word);
 	}
-	return 0;
 }
 
-/*A function that encodes a number using the two complement method*/
-int two_complement(int num)
-{
-	return (~num)+1;
-}

@@ -7,6 +7,7 @@
 #define IS_FALSE 0
 #define NO_ADDRESS 0
 
+/*Strcutrue fot flags to code*/
 typedef struct PSW{
 	unsigned int ERR: 1;
 	unsigned int LABEL: 1;
@@ -29,7 +30,6 @@ enum errType{ALLOCATE, UNEXISTED_LABEL,TOO_MANY_OPERANDS, TOO_FEW_OPERANDS, INVA
 PSW_hold PSW;
 int line_num;
 
-/*void error_check(char *err);*/
 
 /*A function that add error to a linked list of errors*/
 void add_error(int type);

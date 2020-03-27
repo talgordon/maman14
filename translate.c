@@ -3,22 +3,21 @@
 #include "analize_input_line.h"
 
 /*A function that adds a memory word to data image*/
-int write_data_image(dataWord dWord)
+void write_data_image(dataWord dWord)
 {	
 	memWordPtr tmp, newWord;
-	if (dataHead == NULL)/*If the head is null*/
+	if (data_head == NULL)/*If the head is null*/
 	{
-		dataHead = (memWordPtr)malloc(sizeof(memWord));
-		if (dataHead == NULL)/*Couldnt allocate space,error*/
+		data_head = (memWordPtr)malloc(sizeof(memWord));
+		if (data_head == NULL)/*Couldnt allocate space,error*/
 		{
 			add_error(ALLOCATE);
-			return ERROR;
+			return;
 		}
-		dataHead->word = dWord.data;/*Initializes the word*/
-		dataHead->index = DC;/*Initializes the index*/
+		data_head->word = dWord.data;/*Initializes the word*/
+		data_head->index = DC;/*Initializes the index*/
 		DC++;
-		dataHead->next = NULL;
-		return SUCCESS;
+		data_head->next = NULL;
 	}
 	else/*If the haed is not null*/
 	{
@@ -27,9 +26,9 @@ int write_data_image(dataWord dWord)
 		if((tmp == NULL)||(newWord == NULL))/*Couldnt allocate space,error*/
 		{
 			add_error(ALLOCATE);
-			return ERROR;
+			return;
 		}
-		tmp = dataHead;
+		tmp = data_head;
 		while(tmp->next != NULL)
 			tmp = tmp->next;
 
@@ -38,43 +37,41 @@ int write_data_image(dataWord dWord)
 		DC++;
 		newWord->next = NULL;
 		tmp->next = newWord;
-		return SUCCESS;
 	}
 }
 
 /*A function that adds a memory word to code image*/
-int write_code_image(wordPtr ptr, int type)
+void write_code_image(wordPtr ptr, int type)
 {
 	switch (type)/*Check the type*/
 	{
 		case (CODE_WORD):/*If it is code word-initializes in buffer as per the data*/
 		{
 			buffer[IC] = ptr.codeWordPtr->opcode;
-			buffer[IC] = (buffer[IC]<<4) + ptr.codeWordPtr->src;
-			buffer[IC] = (buffer[IC]<<4) + ptr.codeWordPtr->dst;
-			buffer[IC] = (buffer[IC]<<3) + ptr.codeWordPtr->ARE;
+			buffer[IC] = (buffer[IC]<<SRC_CODE_LENGTH) + ptr.codeWordPtr->src;
+			buffer[IC] = (buffer[IC]<<DST_CODE_LENGTH) + ptr.codeWordPtr->dst;
+			buffer[IC] = (buffer[IC]<<ARE_LENGTH) + ptr.codeWordPtr->ARE;
 			break;
 		}
 		case (DATA_WORD):/*If it is data word-initializes in buffer as per the data*/
 		{
 			buffer[IC] = ptr.dataWordPtr->data;
-			buffer[IC] = (buffer[IC]<<3) + ptr.dataWordPtr->ARE;
+			buffer[IC] = (buffer[IC]<<ARE_LENGTH) + ptr.dataWordPtr->ARE;
 			break;
 		}
 		case (DATA_REG_WORD):/*If it is data reg word-initializes in buffer as per the data*/
 		{
 			buffer[IC] = ptr.regWordPtr->rest;
-			buffer[IC] = (buffer[IC]<<3) + ptr.regWordPtr->srcReg;
-			buffer[IC] = (buffer[IC]<<3) + ptr.regWordPtr->dstReg;
-			buffer[IC] = (buffer[IC]<<3) + ptr.regWordPtr->ARE;
+			buffer[IC] = (buffer[IC]<<SRC_DATA_LENGTH) + ptr.regWordPtr->srcReg;
+			buffer[IC] = (buffer[IC]<<DST_DATA_LENGTH) + ptr.regWordPtr->dstReg;
+			buffer[IC] = (buffer[IC]<<ARE_LENGTH) + ptr.regWordPtr->ARE;
 			break;
 		}	
 	}
-	return SUCCESS;
 }
 
 /*A functio that print a nenory word*/
-int print_mem(FILE * fp)
+void print_mem(FILE * fp)
 {
 	memWordPtr tmp;
 	int i;
@@ -86,15 +83,16 @@ int print_mem(FILE * fp)
 	if(tmp == NULL)
 	{
 		add_error(ALLOCATE);
-		return ERROR;
+		return;
 	}
-	tmp = dataHead;
+	tmp = data_head;
 	while(tmp != NULL)
 	{
 		fprintf(fp,"\n%04d\t%05o", tmp->index+IC, tmp->word);
 		tmp = tmp->next;
 	}
 	printf("\n");
-	return SUCCESS;
+	free(tmp);
+
 }
 

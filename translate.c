@@ -75,24 +75,24 @@ void print_mem(FILE * fp)
 {
 	memWordPtr tmp;
 	int i;
-	for (i = 100; i < IC; i++)
+	for (i = 100; i < IC; i++)/*Print the word*/
 	{
 		fprintf(fp,"\n%04d\t%05o", i, buffer[i]);
 	}
 	tmp = (memWordPtr)malloc(sizeof(memWord));
-	if(tmp == NULL)
+	if(tmp == NULL)/*If is not can allocated*/
 	{
 		add_error(ALLOCATE);
 		return;
 	}
 	tmp = data_head;
-	while(tmp != NULL)
+	while(tmp != NULL)/*Print*/
 	{
 		fprintf(fp,"\n%04d\t%05o", tmp->index+IC, tmp->word);
 		tmp = tmp->next;
 	}
 	printf("\n");
-	free(tmp);
+	free(tmp);/*Free the word*/
 
 }
 

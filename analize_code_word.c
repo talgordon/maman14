@@ -30,43 +30,44 @@ void translate_code(wordPtr wPtr, int opcode, int srcType, int dstType)
 	
 	numOfOp_table = 0;
 	numOfOp_line = 0;
-	if (addressTable[opcode].src != NO_OPERAND)
+	if (addressTable[opcode].src != NO_OPERAND)/*If is have an operands*/
 	{
 		numOfOp_table++;
 	}
-	if (addressTable[opcode].dst != NO_OPERAND)
+	if (addressTable[opcode].dst != NO_OPERAND)/*If is have an operands*/
 		numOfOp_table++;
-	if (srcType != NO_OPERAND)
+	if (srcType != NO_OPERAND)/*If is have an operands*/
 		numOfOp_line++;
-	if (dstType != NO_OPERAND)
+	if (dstType != NO_OPERAND)/*If is have an operands*/
 		numOfOp_line++;
 
-	if(numOfOp_table > numOfOp_line)
+	if(numOfOp_table > numOfOp_line)/*If is have too operand ,error*/
 	{
 		add_error(TOO_FEW_OPERANDS);
 	}
-	if(numOfOp_table < numOfOp_line)
+	if(numOfOp_table < numOfOp_line)/*If is have too operand ,error*/
 	{
 		add_error(TOO_MANY_OPERANDS);
 	}
-	if (srcType&addressTable[firstWord->opcode].src == IS_FALSE)	
+	if (srcType&addressTable[firstWord->opcode].src == IS_FALSE)/*If src is illegal,error*/	
 	{
 		add_error(INVALID_SRC_TYPE);
 	}	
-	if (dstType&addressTable[firstWord->opcode].dst == IS_FALSE)
+	if (dstType&addressTable[firstWord->opcode].dst == IS_FALSE)/*If dst is illegal,error*/	
 	{
 		add_error(INVALID_DST_TYPE);
 	}
 	firstWord->src = srcType;
 	firstWord->dst = dstType;
 		
-	/**get the ARE field - last 4 bits in the word**/
+	/*get the ARE field - last 4 bits in the word*/
 	firstWord->ARE = A;
 	wPtr.codeWordPtr = firstWord;
 	write_code_image(wPtr, CODE_WORD);
 	free(firstWord);
 }
 
+/*Completion and finish of binary encoding*/
 void finish_translate(char *line, wordPtr wPtr)
 {
 	char * srcName;
@@ -79,7 +80,7 @@ void finish_translate(char *line, wordPtr wPtr)
 	dstType = 0;
 
 	get_operand(line, &srcType, &dstType, &srcName, &dstName, SECOND);
-	/**get the info words, one, two or non at all**/	
+	/*get the info words, one, two or non at all*/	
 	if(dstType == NO_OPERAND)/*If is not have oparends*/
 	{
 		free(srcName);
@@ -98,13 +99,13 @@ void finish_translate(char *line, wordPtr wPtr)
 		{
 			labelPtr label;
 			label = get_label(srcName, NOTHING, NOTHING, label);
-			if(label->labelLink == EXTERN_LABEL)
+			if(label->labelLink == EXTERN_LABEL)/*If is extern, updating*/
 			{			
 				srcInfo.ARE = E;
 				srcInfo.data = EMPTY;
 				add_extern(label->labelName, IC);
 			}
-			else
+			else/*If is not extern, updating*/
 			{
 				srcInfo.ARE = R;
 				srcInfo.data = label->labelValue;
@@ -114,14 +115,14 @@ void finish_translate(char *line, wordPtr wPtr)
 		write_code_image(wPtr, DATA_WORD);
 		IC++;
 	}
-	else 
+	else/*If src is not IMMEDIATE OR DIRECT*/ 
 	{
 		if (((srcType == DIRECT_REGISTER) || (srcType == INDIRECT_REGISTER)))/*If src is DIRECT_REG OR INDIRECT_REG*/
 		{
 			infoWordReg srcInfoReg;
 			srcInfoReg.srcReg = atoi(srcName);
 			srcInfoReg.ARE = A;
-			if ((dstType == INDIRECT_REGISTER) || (dstType == DIRECT_REGISTER))
+			if ((dstType == INDIRECT_REGISTER) || (dstType == DIRECT_REGISTER))/*If dstType is INDIRECT_REGISTER or DIRECT_REGISTER) */
 				srcInfoReg.dstReg = atoi(dstName);
 			else
 			{
@@ -135,7 +136,7 @@ void finish_translate(char *line, wordPtr wPtr)
 		}
 	}
 
-	if((dstType == IMMEDIATE) || (dstType == DIRECT))
+	if((dstType == IMMEDIATE) || (dstType == DIRECT))/*If dst is IMMEDIATE or DIRECT*/
 	{
 		infoWordData dstInfo;
 		if(dstType == IMMEDIATE)/*If is immideate*/
@@ -147,13 +148,13 @@ void finish_translate(char *line, wordPtr wPtr)
 		{
 			labelPtr label;
 			label = get_label(dstName, NOTHING, NOTHING, label);
-			if(label->labelLink == EXTERN_LABEL)
+			if(label->labelLink == EXTERN_LABEL)/*If label is extern, updating*/
 			{
 				dstInfo.ARE = E;
 				dstInfo.data = EMPTY;
 				add_extern(label->labelName, IC);
 			}
-			else
+			else/*If label is not extern, updating*/
 			{
 				dstInfo.ARE = R;
 				dstInfo.data = label->labelValue;
@@ -164,8 +165,8 @@ void finish_translate(char *line, wordPtr wPtr)
 		write_code_image(wPtr, DATA_WORD);
 		IC++;
 	}
-	else
-		if (!(((srcType == DIRECT_REGISTER) || (srcType == INDIRECT_REGISTER)) && ((dstType == DIRECT_REGISTER) || (dstType == INDIRECT_REGISTER))))/*If is reg*/
+	else/*If dst is not IMMEDIATE or DIRECT*/
+		if (!(((srcType == DIRECT_REGISTER) || (srcType == INDIRECT_REGISTER)) && ((dstType == DIRECT_REGISTER) || (dstType == INDIRECT_REGISTER))))/*If is register*/
 		{
 			infoWordReg dstInfoReg;
 			dstInfoReg.dstReg = atoi(dstName);
@@ -177,10 +178,8 @@ void finish_translate(char *line, wordPtr wPtr)
 			write_code_image(wPtr, DATA_REG_WORD);
 			IC++;
 		}
-	free(srcName);
-	free(dstName);
-			
-	
+	free(srcName);/*Free srcName*/
+	free(dstName);/*Free dstName*/
 }
 
 /*A function that encodes guidance to binary memory word*/
@@ -197,11 +196,11 @@ void translate_data(int type, char * line)
 			add_error(MISSING_DATA);
 			return;
 		}
-		while((num = get_data(&line))!= EOF)
+		while((num = get_data(&line))!= EOF)/*Scan all the word*/
 		{
 			
 			word.data = num;
-			write_data_image(word);
+			write_data_image(word);/*Call to write_data_image with a word*/
 		}
 	}
 
@@ -214,14 +213,14 @@ void translate_data(int type, char * line)
 			return;
 		}
 		line++;
-		while(((c = *line) != '\n')&&(c != '"'))
+		while(((c = *line) != '\n')&&(c != '"'))/*Check all the line*/
 		{
 			word.data = c;
-			write_data_image(word);
+			write_data_image(word);/*Call to write_data_image with a word*/
 			line++;
 		}
 		word.data = 0;
-		write_data_image(word);
+		write_data_image(word);/*Call to write_data_image with a word*/
 	}
 }
 

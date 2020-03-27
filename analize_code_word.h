@@ -7,30 +7,37 @@
 #define A 4
 #define R 2
 #define E 1
-#define IMMEDIATE 1
-#define DIRECT 2
-#define INDIRECT_REGISTER 4
-#define DIRECT_REGISTER 8
+#define OPCODE_LENGTH 4
+#define DST_CODE_LENGTH 4
+#define SRC_CODE_LENGTH 4
+#define ARE_LENGTH 3
+#define INFO_LENGTH 12
+#define SRC_DATA_LENGTH 3
+#define DST_DATA_LENGTH 3
+#define REST_LENGTH 6
+#define DATA_LENGTH 15
+#define EMPTY 0
+#define MAX_MEMORY 4096
 
 typedef struct codeWord{
-	 unsigned int ARE : 3;
-	 unsigned int dst : 4;
-	 unsigned int src : 4;
-	 unsigned int opcode : 4;
+	 unsigned int ARE : ARE_LENGTH;
+	 unsigned int dst : DST_CODE_LENGTH;
+	 unsigned int src : SRC_CODE_LENGTH;
+	 unsigned int opcode : OPCODE_LENGTH;
 }codeWord;
 
 /**second/third code wird, a data word with direct/immidiate address method**/
 typedef struct infoWordData{
-	 unsigned int ARE : 3;
-	 unsigned int data : 12;
+	 unsigned int ARE : ARE_LENGTH;
+	 unsigned int data : INFO_LENGTH;
 }infoWordData;	
 
 /**second/third code wird, a data word with direct register/indirect register address method**/
 typedef struct infoWordReg{
-	 unsigned int ARE : 3;
-	 unsigned int srcReg : 3;
-	 unsigned int dstReg : 3;
-	 unsigned int rest : 6;
+	 unsigned int ARE : ARE_LENGTH;
+	 unsigned int srcReg : SRC_DATA_LENGTH;
+	 unsigned int dstReg : DST_DATA_LENGTH;
+	 unsigned int rest : REST_LENGTH;
 }infoWordReg;
 
 typedef union u_ptr{
@@ -38,25 +45,13 @@ typedef union u_ptr{
 	infoWordData * dataWordPtr;
 	infoWordReg * regWordPtr;
 }wordPtr;
+
 /**data word (data/string)**/
 typedef struct dataWord{
-	 unsigned int data : 15;
+	 unsigned int data : DATA_LENGTH;
 }dataWord;
 
-
-/**a structure to hold a memory word, from one of the optional types**/
-typedef union wordType{
-	codeWord c_word;
-	infoWordData info_d_word;
-	infoWordReg info_r_word;
-	dataWord d_word;
-
-}wordType;
-
 /**memory word, with the value and address (and the next word for the inked list)**/
-
-
-
 typedef struct memWord* memWordPtr;
 
 typedef struct memWord{
@@ -67,23 +62,19 @@ typedef struct memWord{
 
 enum types{CODE_WORD, DATA_WORD, DATA_REG_WORD};
 
-memWordPtr dataHead;
-unsigned int buffer[4096];
+memWordPtr data_head;
+unsigned int buffer[MAX_MEMORY];
 
-
-int write_data_image(dataWord dWord);
-int write_code_image(wordPtr ptr, int type);
-int print_mem();
-
-/*A function that encodes a number using the two complement method*/
-int two_complement(int num);
+void write_data_image(dataWord dWord);
+void write_code_image(wordPtr ptr, int type);
+void print_mem();
 
 /*A function that find the opcode in the array*/
 int find_opcode(char * opcode);
 /*A function that encodes insruction to binary memory word*/
-int translate_code(wordPtr wPtr, int opcode, int srcType, int dstType);
-int finish_translate(char *line, wordPtr wPtr);
+void translate_code(wordPtr wPtr, int opcode, int srcType, int dstType);
+void finish_translate(char *line, wordPtr wPtr);
 /*A function that encodes guidance to binary memory word*/
-int translate_data(int type, char * line);
+void translate_data(int type, char * line);
 
 

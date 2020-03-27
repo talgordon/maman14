@@ -10,6 +10,7 @@ void code_handle_first(char * labelName, char * word);
 void code_handle_second();
 /*A function that initializes global variables using code*/
 void init();
+/*A function that free a word*/
 void free_mem(char * name);
 
 

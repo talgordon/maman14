@@ -101,7 +101,7 @@ int main(int argc, char * argv[])
 		{
 			inputLine = buf;
 			
-			if (!((inputLine[0] == '\n')||((inputLine[0] == '/')&&(inputLine[1] == '*')&&(inputLine[strlen(inputLine)-3] == '*')&& (inputLine[strlen(inputLine)-2] == '/'))))/**/
+			if (!((inputLine[0] == '\n')||((inputLine[0] == '/')&&(inputLine[1] == '*')&&(inputLine[strlen(inputLine)-3] == '*')&& (inputLine[strlen(inputLine)-2] == '/'))))
 			{			
 				wordType = get_word(&inputLine, &labelName);
 				if (wordType == LABEL)/*If the word is label*/
@@ -147,6 +147,7 @@ int main(int argc, char * argv[])
 	}
 	else
 		build_output();/*Call to build_out to build the file output*/
+	/*Call to free and free_list to free all*/
 	free(buf);
 	free(labelName);
 	free(word);

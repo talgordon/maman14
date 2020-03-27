@@ -39,22 +39,22 @@ void add_label(char * name, int value, int type, int link)
 		{
 			add_error(ALLOCATE);
 		}
-		if (!isalpha(*name))
+		if (!isalpha(*name))/*If is illegal name*/
 		{
 			add_error(INVALID_LABEL_NAME);
 			return;
 		}
-		if (isreserved(name))
+		if (isreserved(name))/*If is illegal name*/
 		{
 			add_error(RESERVED_LABEL_NAME);
 			return;
 		}
-		if (strlen(name) > MAX_LABEL)
+		if (strlen(name) > MAX_LABEL)/*If is illegal name*/
 		{
 			add_error(TOO_LONG_LABEL);
 			return;
 		}
-		if (isillegal(name))
+		if (isillegal(name))/*If is illegal name*/
 		{
 			add_error(INVALID_LABEL_NAME);
 			return;
@@ -88,22 +88,22 @@ void add_label(char * name, int value, int type, int link)
 		{
 			add_error(ALLOCATE);
 		}
-		if (!isalpha(*name))
+		if (!isalpha(*name))/*If is illegal name*/
 		{
 			add_error(INVALID_LABEL_NAME);
 			return;
 		}
-		if (isreserved(name))
+		if (isreserved(name))/*If is illegal name*/
 		{
 			add_error(RESERVED_LABEL_NAME);
 			return;
 		}
-		if (strlen(name) > MAX_LABEL)
+		if (strlen(name) > MAX_LABEL)/*If is illegal name*/
 		{
 			add_error(TOO_LONG_LABEL);
 			return;
 		}
-		if (isillegal(name))
+		if (isillegal(name))/*If is illegal name*/
 		{
 			add_error(INVALID_LABEL_NAME);
 			return;
@@ -158,7 +158,7 @@ void update_label(int update, int updateType, int labelID, int IDType, char *nam
 	{
 		if ((strcmp(tmp->labelName, name) == 0)||((strcmp(name, "ALL") == 0) && (((IDType == LABEL_TYPE) && (labelID == tmp->labelType)) || ((IDType == LABEL_LINK) && (labelID == tmp->labelLink)))))
 		{
-			if(updateType == LABEL_VALUE)
+			if(updateType == LABEL_VALUE)/*Updating the value*/
 			{
 				tmp->labelValue+= update;
 				if (strcmp(tmp->labelName, name) == 0)				
@@ -166,7 +166,7 @@ void update_label(int update, int updateType, int labelID, int IDType, char *nam
 					return;
 				}
 			}
-			if(updateType == LABEL_TYPE)
+			if(updateType == LABEL_TYPE)/*Updating the type*/
 			{
 				tmp->labelType = update;
 				if (strcmp(tmp->labelName, name) == 0)				
@@ -174,7 +174,7 @@ void update_label(int update, int updateType, int labelID, int IDType, char *nam
 					return;			
 				}
 			}
-			if(updateType == LABEL_LINK)
+			if(updateType == LABEL_LINK)/*Updating the link*/
 			{
 				tmp->labelLink = update;
 				if (strcmp(tmp->labelName, name) == 0)				

@@ -3,6 +3,8 @@
 #include <string.h>
 #define NO_ADDRESS 0
 #define MAX_LABEL 31
+#define NOTHING 0
+
 typedef struct label * labelPtr;
 
 /*struct for label with the name, value, type and link*/
@@ -42,11 +44,9 @@ int isillegal(char * word);
 /*A function that add the label to a linked list*/
 void add_label(char * name, int value, int type, int link);
 /*A function get a anew label*/
-void get_label(char *name, int feature, int featureType, labelPtr* label);
+labelPtr get_label(char *name, int feature, int featureType, labelPtr label);
 /*A function that update a new label*/
-int update_label(int update, int updateType, int labelID, int IDType, char *name);
-/*A function that print a label name, label value and his type*/
-void print_label();
+void update_label(int update, int updateType, int labelID, int IDType, char *name);
 
 /*A function that add a extern to a linked list with exrerns*/
 void add_extern(char * name, int value);	

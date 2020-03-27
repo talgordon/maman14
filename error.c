@@ -6,10 +6,13 @@ void add_error(int type)
 	errorPtr tmp, newError;
 	if (error_head == NULL)/*If the linked list is empty*/
 	{	
-		set_flag("ERROR", 1);/*Turns on the error flag*/
+		set_flag("ERROR", IS_TRUE);/*Turns on the error flag*/
 		error_head = (errorPtr)malloc(sizeof(error));
 		if(error_head == NULL)/*If could not allocate space*/
+		{
 			add_error(ALLOCATE);/*Print error in allocation place*/
+			return;
+		}
 		error_head->errorType = type;/*Initializes the type in a linked list*/
 		error_head->lineNum = line_num;/*Initializes the line num in a linked list*/
 		error_head->next = NULL;/*Initializes the pointer to NULL*/
@@ -19,7 +22,10 @@ void add_error(int type)
 		tmp = (errorPtr)malloc(sizeof(error));
 		newError = (errorPtr)malloc(sizeof(error));
 		if((tmp == NULL)||(newError == NULL))/*If could not allocate space*/
+		{
 			add_error(ALLOCATE);/*Print error in allocation place*/
+			return;
+		}
 		tmp = error_head;/*Initializes tmp to the top of the list*/
 		while(tmp->next != NULL)/*Loop that run as long as the tmp equal to NULL-end of the list*/
 		{
@@ -38,7 +44,10 @@ void print_error()
 	errorPtr tmp;
 	tmp = (errorPtr)malloc(sizeof(error));
 	if(tmp == NULL)/*If tmp equal to NULL*/
+	{
 		add_error(ALLOCATE);/*Print error in allocation place*/
+		return;		
+	}
 	tmp = error_head;
 	while(tmp != NULL)/*Loop that run as long as the tmp equal to NULL-end of the list*/
 	{
@@ -102,6 +111,7 @@ void print_error()
 		fprintf(stderr, ", in line:%d\n", tmp->lineNum+1);
 		tmp = tmp->next;	
 	}
+	free(tmp);
 }
 
 /*A function that returns the value of the flag in the data structure*/

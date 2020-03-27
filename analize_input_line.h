@@ -18,16 +18,18 @@ unsigned int IC;
 unsigned int L;
 char * inputLine;
 
-/*Enum with thw types possible*/
+/*Enum with the types possible*/
 typedef enum type{LABEL , DATA , STRING , EXTERN , ENTRY, CODE, END} types;
 
 typedef struct addressMethod *addrMethodPtr;
 
+/*A structure that represents valid addressing methods fot each opcode*/
 typedef struct addressMethod{
 	unsigned int src : NUM_OF_ADDRESS_METHOD;
 	unsigned int dst : NUM_OF_ADDRESS_METHOD;
 }addressMethod;
 
+/*An array with all the opcode is possible*/
 addressMethod addressTable[NUM_OF_OPCODE];
 
 /*A function that skip white spaces.*/

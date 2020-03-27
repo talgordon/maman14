@@ -5,12 +5,12 @@
 int isreserved(char * word)
 {
 	if ((strcmp(word, "string") == 0 )|| (strcmp(word, "data") == 0) || (strcmp(word, "extern") == 0) || (strcmp(word, "entry") == 0))
-		return 0;
+		return IS_TRUE;
 	if ((strcmp(word, "r1") == 0) || (strcmp(word, "r2") == 0) || (strcmp(word, "r3") == 0) || (strcmp(word, "r4") == 0) || (strcmp(word, "r5") == 0) || (strcmp(word, "r6") == 0) || (strcmp(word, "r7") == 0))
-		return 0;
+		return IS_TRUE;
 	if ((strcmp(word, "mov") == 0) || (strcmp(word, "cmp") == 0) || (strcmp(word, "add") == 0) || (strcmp(word, "sub") == 0) || (strcmp(word, "lea") == 0) || (strcmp(word, "clr") == 0) || (strcmp(word, "not") == 0) || (strcmp(word, "inc") == 0) || (strcmp(word, "dec") == 0) || (strcmp(word, "jmp") == 0) || (strcmp(word, "bne") == 0) || (strcmp(word, "red") == 0) || (strcmp(word, "prn") == 0) || (strcmp(word, "jsr") == 0) || (strcmp(word, "rts") == 0) || (strcmp(word, "stop") == 0))
-		return 0;
-	return 1;
+		return IS_TRUE;
+	return IS_FALSE;
 }
 
 /*A function that check if the word that she get is legal andd return 0/1*/
@@ -20,38 +20,9 @@ int isillegal(char * word)
 	for (i = 0; i<strlen(word); i++)
 	{
 		if ((!isalpha(word[i])) && (!isdigit(word[i])))
-			return 0;
+			return IS_TRUE;
 	} 
-	return 1;
-}
-
-/*A function that print a label name, label value and his type*/
-void print_label()
-{
-	labelPtr tmp;
-	tmp = (labelPtr)malloc(sizeof(label));
-	if(tmp == NULL)/*If is not have a label return error*/
-	{
-		add_error(ALLOCATE);
-	}
-	tmp = label_head;
-	while(tmp != NULL)/*Loop that print the label as long as have a label*/
-	{
-		printf("\n%s, %d, ", tmp->labelName, tmp->labelValue);/*Print the label name and his value*/
-		if(tmp->labelType == DATA_LABEL)/*If the label is data*/
-			printf("data");/*Print the type-data*/
-		if(tmp->labelType == CODE_LABEL)/*If the label is code*/
-			printf("code");/*Print the type-code*/
-		if(tmp->labelType == UNDEFINED_LABEL)/*If the label is not set*/
-			printf("undefined");/*Print undefined*/
-		if(tmp->labelLink == ENTRY_LABEL)/*If the label is entry*/
-			printf(", entry\n");/*Print the type-entry*/
-		if(tmp->labelLink == EXTERN_LABEL)/*If the label is extern*/
-			printf(", extern\n");/*Print the type-extern*/
-		if(tmp->labelLink == NOT_LINKED_LABEL)/*If the label is not set*/
-			printf("\n");/*Print undefined*/
-		tmp = tmp->next;/*Progress to the next node*/	
-	}
+	return IS_FALSE;
 }
 
 /*A function that add the label to a linked list*/
@@ -73,7 +44,7 @@ void add_label(char * name, int value, int type, int link)
 			add_error(INVALID_LABEL_NAME);
 			return;
 		}
-		if (isreserved(name) == 0)
+		if (isreserved(name))
 		{
 			add_error(RESERVED_LABEL_NAME);
 			return;
@@ -83,7 +54,7 @@ void add_label(char * name, int value, int type, int link)
 			add_error(TOO_LONG_LABEL);
 			return;
 		}
-		if (isillegal(name) == 0)
+		if (isillegal(name))
 		{
 			add_error(INVALID_LABEL_NAME);
 			return;
@@ -101,6 +72,7 @@ void add_label(char * name, int value, int type, int link)
 		if((tmp == NULL)||(newLabel == NULL))/*If the new label is empty-return error*/
 		{
 			add_error(ALLOCATE);
+			return;
 		}
 		tmp = label_head;
 		while(tmp->next != NULL)/*Loop that run by the end of the list*/
@@ -121,7 +93,7 @@ void add_label(char * name, int value, int type, int link)
 			add_error(INVALID_LABEL_NAME);
 			return;
 		}
-		if (isreserved(name) == 0)
+		if (isreserved(name))
 		{
 			add_error(RESERVED_LABEL_NAME);
 			return;
@@ -131,7 +103,7 @@ void add_label(char * name, int value, int type, int link)
 			add_error(TOO_LONG_LABEL);
 			return;
 		}
-		if (isillegal(name) == 0)
+		if (isillegal(name))
 		{
 			add_error(INVALID_LABEL_NAME);
 			return;
@@ -146,39 +118,40 @@ void add_label(char * name, int value, int type, int link)
 }
 
 /*A function get a anew label*/
-void get_label(char *name, int feature, int featureType, labelPtr* label)
+labelPtr get_label(char *name, int feature, int featureType, labelPtr label)
 {
-	if(*label == NULL)/*If the label is NULL-return error*/
-	{
+	/*if(label == NULL)*//*If the label is NULL-return error*/
+	/*{
 		add_error(ALLOCATE);
 		return;
-	}
-	*label = label_head;
-	while(*label != NULL)/*Al loop that run as long as the label equle to NULL*/
+	}*/
+	label = label_head;
+	while(label != NULL)/*Al loop that run as long as the label equle to NULL*/
 	{
-		if((featureType == LABEL_NAME) && (strcmp((*label)->labelName,name) == 0))	
-			return;
-		if((featureType == LABEL_VALUE) && (feature == (*label)->labelValue))	
-			return;
-		if((featureType == LABEL_TYPE) && (feature == (*label)->labelType))
-			return;
-		if((featureType == LABEL_LINK) && (feature == (*label)->labelLink))
-			return;
-		*label = (*label)->next;
+		if((featureType == LABEL_NAME) && (strcmp((label)->labelName,name) == 0))	
+			return label;
+		if((featureType == LABEL_VALUE) && (feature == (label)->labelValue))	
+			return label;
+		if((featureType == LABEL_TYPE) && (feature == (label)->labelType))
+			return label;
+		if((featureType == LABEL_LINK) && (feature == (label)->labelLink))
+			return label;
+		label = (label)->next;
 	}
-	*label = NULL;
+	label = NULL;
 	add_error(UNEXISTED_LABEL);
+	return NULL;
 }
 
 /*A function that update a new label*/
-int update_label(int update, int updateType, int labelID, int IDType, char *name)
+void update_label(int update, int updateType, int labelID, int IDType, char *name)
 {
 	labelPtr tmp;
 	tmp = (labelPtr)malloc(sizeof(label));
 	if(tmp == NULL)/*If the tmp is empty-return error*/
 	{
 		add_error(ALLOCATE);
-		return ERROR;
+		return;
 	}	
 	tmp = label_head;
 	while(tmp != NULL)/*Loop that run as long as the temp isn't equle to null and update the label*/
@@ -189,26 +162,34 @@ int update_label(int update, int updateType, int labelID, int IDType, char *name
 			{
 				tmp->labelValue+= update;
 				if (strcmp(tmp->labelName, name) == 0)				
-					return SUCCESS;
+				{
+					return;
+				}
 			}
 			if(updateType == LABEL_TYPE)
 			{
 				tmp->labelType = update;
 				if (strcmp(tmp->labelName, name) == 0)				
-					return SUCCESS;
+				{
+					return;			
+				}
 			}
 			if(updateType == LABEL_LINK)
 			{
 				tmp->labelLink = update;
 				if (strcmp(tmp->labelName, name) == 0)				
-					return SUCCESS;
+				{
+					return;
+				}
 			}			
 		}
 		tmp = tmp->next;
 	}
 	if (strcmp(name, "ALL") != 0)
+	{
 		add_error(UNEXISTED_LABEL);
-	return ERROR;
+	}
+	return;
 }
 
 /*A function that add a extern to a linked list with exrerns*/
@@ -222,6 +203,7 @@ void add_extern(char * name, int value)
 		if((extern_head->externName == NULL)||(extern_head == NULL))/*If the name is empty-return error*/
 		{
 			add_error(ALLOCATE);
+			return;
 		}
 		strcpy(extern_head->externName, name);/*Add the name to the labelNmae*/
 		extern_head->externValue = value;/*Add the value to the labelValue*/
@@ -244,6 +226,7 @@ void add_extern(char * name, int value)
 		if (newExtern->externName == NULL)/*If is not have the name-return error*/
 		{
 			add_error(ALLOCATE);
+			return;
 		}
 		strcpy(newExtern->externName, name);/*Add the name to the labelNmae*/
 		newExtern->externValue = value;/*Add the value to the labelValue*/
@@ -260,6 +243,7 @@ void print_extern(FILE * fp)
 	if(tmp == NULL)/*If is not have a label return error*/
 	{
 		add_error(ALLOCATE);
+		return;
 	}
 	tmp = extern_head;
 	while(tmp != NULL)/*Loop that print the label as long as have a label*/
@@ -267,5 +251,6 @@ void print_extern(FILE * fp)
 		fprintf(fp,"\n%s\t%04d", tmp->externName, tmp->externValue);/*Print the label name and his value*/
 		tmp = tmp->next;/*Progress to the next node*/	
 	}
+	free(tmp);
 }
 
